@@ -1,0 +1,6 @@
+{
+  "hotels": [
+    { "id": 1, "nom": "Hotel Le Soleil", "ville": "Antananarivo" },
+    { "id": 2, "nom": "Hotel Océan Bleu", "ville": "Toamasina" }
+  ]
+}
