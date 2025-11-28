@@ -6,6 +6,6 @@ import hotelRoutes from './hotelRoutes.js';
 const router = express.Router();
 router.use('/stock', stockRoutes);
 router.use('/categories-stock', categorieStockRoutes);
-router.use('/api/admin/hotel', hotelRoutes)
+router.use('/hotel', hotelRoutes);
 
 export default router;

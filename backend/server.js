@@ -10,6 +10,8 @@ import sequelize from './src/config/database.js';
 import authRoutes from './src/routes/authRoutes.js';
 import adminRoutes from './src/routes/admin/index.js';
 import employeeRoutes from './src/routes/employee/stock/index.js';
+import superadminRoutes from './src/routes/superadmin/index.js';
+// Ajoute tes autres routes ici plus tard
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,42 +28,21 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware de logging
+// Logging simple
 app.use((req, res, next) => {
-  console.log(`📥 ${new Date().toISOString()} - ${req.method} ${req.path}`);
-  if (req.body && Object.keys(req.body).length > 0) {
-    console.log('   Body:', JSON.stringify(req.body, null, 2));
-  }
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
 });
 
-// Routes de base
-app.get('/', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: '🏨 API Hotel Management',
-    version: '1.0.0'
-  });
-});
-
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: '✅ API fonctionne correctement',
-    timestamp: new Date().toISOString()
-  });
-});
-
-app.get('/api/test', (req, res) => {
-  res.json({ success: true, message: 'Route de test OK' });
-});
-
-// ROUTES D'AUTHENTIFICATION
+// Routes
+app.get('/', (req, res) => res.json({ message: 'API Hotel Management – OK', version: '1.0.0' }));
 app.use('/api/auth', authRoutes);
 console.log('✅ Routes /api/auth montées');
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/employee', employeeRoutes);
+app.use('/api/superadmin', superadminRoutes);
+console.log('✅ Routes /api/superadmin montées');
 
 // Middleware 404 - APRÈS toutes les routes
 app.use((req, res) => {
@@ -86,57 +67,32 @@ app.use((req, res) => {
   });
 });
 
-// Middleware de gestion des erreurs
+// Error handler
 app.use((err, req, res, next) => {
-  console.error('❌ Erreur serveur:', err);
-  res.status(500).json({
-    success: false,
-    message: 'Erreur serveur',
-    error: process.env.NODE_ENV === 'development' ? {
-      message: err.message,
-      stack: err.stack
-    } : undefined
-  });
+  console.error('Erreur:', err.message);
+  res.status(500).json({ success: false, message: 'Erreur serveur' });
 });
 
-
-// Synchronisation et démarrage du serveur
+// Démarrage
 const startServer = async () => {
   try {
     // Test de connexion à la base de données
     await sequelize.authenticate();
-    console.log('✅ MySQL connecté avec succès');
+    console.log('Connexion MySQL établie avec succès !');
 
-    // Synchroniser les modèles
-    if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync();
-      console.log('✅ Modèles synchronisés');
-    }
+    // PLUS DE SYNC ICI → on utilise les migrations désormais
+    console.log('Prêt – Utilise npx sequelize-cli db:migrate si besoin');
 
-    // Démarrage du serveur
-    const server = app.listen(PORT, () => {
-      console.log('');
-      console.log('🎉 ================================');
-      console.log('🎉 Serveur démarré avec succès !');
-      console.log('🎉 ================================');
-      console.log(`📍 URL: http://localhost:${PORT}`);
-      console.log(`📍 Health: http://localhost:${PORT}/api/health`);
-      console.log('');
-      console.log('📝 Routes disponibles:');
-      console.log('   POST http://localhost:' + PORT + '/api/auth/register');
-      console.log('   POST http://localhost:' + PORT + '/api/auth/login');
-      console.log('   GET  http://localhost:' + PORT + '/api/auth/me');
-      console.log('');
-      console.log(`🔧 Mode: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`💾 Base de données: ${process.env.DB_NAME || 'hotel_management'}`);
-      console.log('🎉 ================================');
-      console.log('✨ Prêt à recevoir des requêtes !');
-      console.log('');
+    app.listen(PORT, () => {
+      console.log('===================================');
+      console.log('SERVEUR DÉMARRÉ !');
+      console.log(`http://localhost:${PORT}`);
+      console.log(`Mode: ${process.env.NODE_ENV || 'development'}`);
+      console.log('===================================');
     });
 
   } catch (error) {
-    console.error('❌ Erreur de démarrage:', error);
-    console.error('Stack:', error.stack);
+    console.error('Impossible de démarrer:', error);
     process.exit(1);
   }
 };

@@ -7,7 +7,15 @@ import sequelize from '../../config/database.js';
 // Obtenir les informations de son hôtel
 export const getMyHotel = async (req, res) => {
   try {
-    const hotelId = req.user.hotelId;
+    // Utiliser req.hotelId au lieu de req.user.hotelId
+    const hotelId = req.hotelId || req.user.hotel_id;
+
+    if (!hotelId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Aucun hôtel associé à votre compte'
+      });
+    }
 
     const hotel = await Hotel.findByPk(hotelId, {
       include: [
@@ -25,13 +33,23 @@ export const getMyHotel = async (req, res) => {
     });
 
     if (!hotel) {
-      return res.status(404).json({ message: 'Hôtel non trouvé' });
+      return res.status(404).json({
+        success: false,
+        message: 'Hôtel non trouvé'
+      });
     }
 
-    res.status(200).json(hotel);
+    res.status(200).json({
+      success: true,
+      data: hotel
+    });
   } catch (error) {
     console.error('Erreur lors de la récupération de l\'hôtel:', error);
-    res.status(500).json({ message: 'Erreur serveur', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Erreur serveur',
+      error: error.message
+    });
   }
 };
 

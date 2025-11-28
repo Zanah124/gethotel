@@ -17,7 +17,8 @@ Subscription.init(
         model: 'hotels',
         key: 'id'
       },
-      onDelete: 'CASCADE'
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
     },
     plan_id: {
       type: DataTypes.INTEGER,

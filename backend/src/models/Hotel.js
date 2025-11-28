@@ -2,6 +2,7 @@ import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database.js';
 import Subscription from './Subscription.js';
 import SubscriptionPlan from './SubscriptionPlan.js';
+import User from './User.js';
 
 class Hotel extends Model {}
 
@@ -50,10 +51,16 @@ Hotel.init(
   }
 );
 
-// Associations
+// association
 Hotel.hasOne(Subscription, {
   foreignKey: 'hotel_id',
   as: 'subscription'
+});
+
+
+Hotel.belongsTo(User, {
+  foreignKey: 'admin_hotel_id',
+  as: 'admin'
 });
 
 Subscription.belongsTo(Hotel, {

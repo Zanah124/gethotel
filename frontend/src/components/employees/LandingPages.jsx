@@ -18,8 +18,7 @@ const LandingPage = () => {
             <a href="#tarifs" className="hover:text-[#f4B34C] transition">Tarifs</a>
           </div>
           <div className="flex gap-4">
-            <Link
-              to="/login"
+            <Link to="/login"
               className="px-6 py-3 border border-[#f4B34C] text-[#f4B34C] rounded-full hover:bg-[#f4B34C] hover:text-black transition font-medium"
             >
               Se connecter
@@ -137,7 +136,7 @@ const LandingPage = () => {
       {/* Footer */}
       <footer className="bg-[#0a0a0a] border-t border-gray-800 py-12 px-6 lg:px-12">
         <div className="max-w-7xl mx-auto text-center text-gray-500">
-          <p>© 2025 HôtelPro • Tous droits réservés</p>
+          <p>© 2025 GetHotel • Tous droits réservés</p>
         </div>
       </footer>
     </div>

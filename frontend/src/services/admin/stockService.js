@@ -1,4 +1,3 @@
-// frontend-web/src/services/admin/stockService.js
 import api from '../api';
 
 const stockService = {

@@ -4,10 +4,13 @@ const roleCheck = (allowedRoles) => {
     const user = req.user; // mis par le middleware auth
 
     if (!user || !user.role) {
-      return res.status(401).json({ message: 'Utilisateur non authentifié' });
+      return res.status(401).json({ 
+        success: false,
+        message: 'Utilisateur non authentifié' 
+      });
     }
 
-    // Normalisation pour éviter les bugs de casse / tableau
+    // Normalisation du rôle utilisateur
     let userRole = user.role;
 
     if (typeof userRole === 'string') {
@@ -16,14 +19,22 @@ const roleCheck = (allowedRoles) => {
       userRole = userRole.map(r => r.toLowerCase().trim());
     }
 
+    // ✅ SUPERADMIN a accès à TOUT
+    if (userRole === 'superadmin' || (Array.isArray(userRole) && userRole.includes('superadmin'))) {
+      return next();
+    }
+
+    // Normalisation des rôles autorisés
     const normalizedAllowed = allowedRoles.map(r => r.toLowerCase().trim());
 
+    // Vérification d'accès pour les autres rôles
     const hasAccess = Array.isArray(userRole)
       ? userRole.some(r => normalizedAllowed.includes(r))
       : normalizedAllowed.includes(userRole);
 
     if (!hasAccess) {
       return res.status(403).json({ 
+        success: false,
         message: 'Accès refusé : rôle insuffisant.',
         required: allowedRoles,
         current: user.role 
