@@ -10,5 +10,6 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/api', routes);
+app.use('/uploads', express.static('uploads'));
 
 export default app;

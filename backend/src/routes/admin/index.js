@@ -1,7 +1,8 @@
 import express from 'express';
+import hotelRoutes from './hotelRoutes.js';
 import categorieStockRoutes from './stock/categorieStockRoutes.js';
 import stockRoutes from './stock/stockRoutes.js';
-import hotelRoutes from './hotelRoutes.js';
+
 
 const router = express.Router();
 router.use('/stock', stockRoutes);

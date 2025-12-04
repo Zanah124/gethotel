@@ -1,8 +1,8 @@
-// src/context/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {  useState, useEffect } from 'react';
 import api from '../services/api';
+import { AuthContext } from './AuthContext';
 
-const AuthContext = createContext();
+
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          const res = await api.get('/api/auth/me'); // ou /api/admin/me selon ta route
+          const res = await api.get('/auth/me');
           setUser(res.data.user || res.data.data);
         } catch (err) {
           console.error("Token invalide ou expiré", err);
@@ -30,9 +30,10 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await api.post('/api/auth/login', { email, password });
+    const res = await api.post('/auth/login', { email, password });
     const { token, user } = res.data;
     localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     setUser(user);
   };
@@ -50,10 +51,3 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth doit être utilisé dans un AuthProvider');
-  }
-  return context;
-};

@@ -1,6 +1,9 @@
+// src/components/auth/LoginForm.jsx   (ou là où tu l’as placé)
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useAuth } from '../../context/useAuth'; 
+
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({
@@ -12,7 +15,8 @@ export default function LoginForm() {
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
-
+  const { login } = useAuth(); 
+  
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -26,37 +30,27 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', formData);
+      // On utilise la fonction login du AuthContext → elle fait tout (token + user + headers)
+      await login(formData.email, formData.password);
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-      if (response.data.success) {
-        const { user, token } = response.data;
+      // Petit message de bienvenue
+      alert(`Connexion réussie ! Bienvenue ${user?.prenom || ''} `);
 
-        // Sauvegarde du token et des infos utilisateur
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-
-        // Message de succès rapide
-        alert('Connexion réussie ! Bienvenue ' + user.prenom + ' 👋');
-
-        // Redirection selon le rôle
-        switch (user.role) {
-          case 'client':
-            navigate('/client/dashboard');     // à créer plus tard
-            break;
-          case 'employee':
-          case 'admin':
-            navigate('/admin/dashboard');
-            break;
-          case 'superadmin':
-            navigate('/superadmin/dashboard');
-            break;
-          default:
-            navigate('/');
-        }
+      // Redirection selon le rôle (user est déjà à jour grâce au contexte)
+      if (user.role === 'super_admin' || user.role === 'superadmin') {
+        navigate('/super/dashboard');
+      } else if (user.role === 'admin' || user.role === 'admin_hotel') {
+        navigate('/admin/dashboard');
+      } else if (user.role === 'client') {
+        navigate('/client/dashboard');
+      } else {
+        navigate('/');
       }
     } catch (err) {
-      const message = err.response?.data?.message || 'Erreur de connexion. Vérifiez vos identifiants.';
+      const message = err.response?.data?.message || 'Identifiants incorrects ou serveur indisponible.';
       setError(message);
+      console.error('Erreur login :', err);
     } finally {
       setLoading(false);
     }

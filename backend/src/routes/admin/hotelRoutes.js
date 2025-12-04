@@ -25,3 +25,4 @@ router.put('/', updateMyHotel);
 router.post('/logo', upload.single('logo'), uploadHotelPhoto);
 
 export default router;
+

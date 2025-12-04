@@ -13,8 +13,9 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
+    const hotelId = req.hotelId || req.user?.hotel_id || 'hotel';
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `${req.user.hotelId}-${uniqueSuffix}${path.extname(file.originalname)}`);
+    cb(null, `${hotelId}-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });
 

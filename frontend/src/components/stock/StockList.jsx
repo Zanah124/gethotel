@@ -1,4 +1,3 @@
-// frontend-web/src/components/stock/StockList.jsx
 import Button from '../common/Button';
 import Badge from '../common/Badge';
 

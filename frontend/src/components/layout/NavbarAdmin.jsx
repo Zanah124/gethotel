@@ -1,7 +1,6 @@
-// src/components/layout/NavbarAdmin.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { assets } from '../../assets/assets';
+import { assets } from '../../assets/assets.js';
 
 const NavbarAdmin = () => {
   const location = useLocation();

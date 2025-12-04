@@ -56,7 +56,7 @@ export const getMyHotel = async (req, res) => {
 // Mettre à jour les informations de son hôtel
 export const updateMyHotel = async (req, res) => {
   try {
-    const hotelId = req.user.hotelId;
+    const hotelId = req.hotelId || req.user.hotel_id;
     const {
       nom,
       adresse,
@@ -67,6 +67,8 @@ export const updateMyHotel = async (req, res) => {
       email,
       description,
       etoiles,
+      photo_principale,
+      photos,
       equipements,
       services,
       politiqueAnnulation
@@ -89,6 +91,8 @@ export const updateMyHotel = async (req, res) => {
       email,
       description,
       etoiles,
+      photo_principale,
+      photos,
       equipements,
       services,
       politiqueAnnulation
@@ -107,7 +111,7 @@ export const updateMyHotel = async (req, res) => {
 // Uploader une photo de l'hôtel
 export const uploadHotelPhoto = async (req, res) => {
   try {
-    const hotelId = req.user.hotelId;
+    const hotelId = req.hotelId || req.user.hotel_id;
 
     if (!req.file) {
       return res.status(400).json({ message: 'Aucun fichier fourni' });
@@ -138,7 +142,7 @@ export const uploadHotelPhoto = async (req, res) => {
 // Supprimer une photo de l'hôtel
 export const deleteHotelPhoto = async (req, res) => {
   try {
-    const hotelId = req.user.hotelId;
+    const hotelId = req.hotelId || req.user.hotel_id;
     const { photoUrl } = req.body;
 
     const hotel = await Hotel.findByPk(hotelId);
@@ -165,7 +169,7 @@ export const deleteHotelPhoto = async (req, res) => {
 // Obtenir les statistiques de l'hôtel
 export const getHotelStats = async (req, res) => {
   try {
-    const hotelId = req.user.hotelId;
+    const hotelId = req.hotelId || req.user.hotel_id;
 
     // Importer les modèles nécessaires
     const { Chambre, Reservation, Client, Employee } = require('../../models');

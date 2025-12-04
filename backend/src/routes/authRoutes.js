@@ -27,7 +27,7 @@ console.log('📍 Routes enregistrées:');
 router.stack.forEach((r) => {
   if (r.route) {
     const methods = Object.keys(r.route.methods).join(', ').toUpperCase();
-    console.log(`   ${methods} /api/auth${r.route.path}`);
+    console.log(`   ${methods} /auth${r.route.path}`);
   }
 });
 
