@@ -23,6 +23,8 @@ import Hotels from './pages/admin/Hotels.jsx';
 // pages superadmin
 import { SuperAdminRoute } from './components/superadmin/ProtectedRoute.jsx';
 import MenuSuper from './pages/superadmin/MenuSuper.jsx';
+import HotelsG from './pages/superadmin/HotelsG.jsx';
+import CreateHotel from './components/superadmin/CreateHotel.jsx';
 
 const AppContent = () => {
   const location = useLocation();
@@ -68,11 +70,20 @@ const AppContent = () => {
           <Route path="/admin/hotel/edit" element={<EditHotelProfile />} />
 
           {/* Super Admin → tout sous /super */}
+          
+
           <Route
             path="/super/*"
             element={
               <SuperAdminRoute>
-                <MenuSuper />
+                <div className="max-w-7xl mx-auto px-4 py-8">
+                <Routes>
+                    <Route index element={<MenuSuper />} />
+                    <Route path="dashboard" element={<MenuSuper />} />
+                    <Route path="hotels" element={<HotelsG />} />
+                    <Route path="hotels/create" element={<CreateHotel />} />
+                </Routes>
+                </div>
               </SuperAdminRoute>
             }
           />

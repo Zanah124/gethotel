@@ -1,4 +1,3 @@
-// src/components/admin/EditHotelProfile.jsx   (ou pages/admin/…)
 import React, { useState, useEffect } from 'react';
 import { Building2, Star, Save, Loader2, Upload, Camera } from 'lucide-react';
 import api from '../../services/api';
@@ -240,7 +239,7 @@ const EditHotelProfile = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="bg-gradient-to-r from-[#49B9FF] to-[#7238D4] text-white font-bold py-4 px-10 rounded-full flex items-center gap-3 hover:shadow-2xl transition disabled:opacity-70"
+                className="bg-gradient-to-r from-[#49B9FF] to-[#49B9FF] text-white font-bold py-4 px-10 rounded-full flex items-center gap-3 hover:shadow-2xl transition disabled:opacity-70"
               >
                 {saving ? <Loader2 className="animate-spin" /> : <Save size={24} />}
                 {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}

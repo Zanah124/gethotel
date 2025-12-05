@@ -30,7 +30,7 @@ const NavbarAdmin = () => {
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
         isScrolled
           ? 'bg-white/95 shadow-lg backdrop-blur-md'
-          : 'bg-gradient-to-r from-[#49B9FF] to-[#7238D4]'
+          : 'bg-gradient-to-r from-[#49B9FF] to-[#99f6e4]'
       }`}
     >
       <div className="flex items-center justify-between px-6 md:px-12 lg:px-20 h-20 md:h-24">

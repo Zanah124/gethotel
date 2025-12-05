@@ -50,11 +50,11 @@ const HotelProfile = () => {
         <div className="relative -mt-20 px-8">
           {/* Logo / Photo principale */}
           <div className="inline-block bg-white p-4 rounded-2xl shadow-2xl">
-            <div className="w-40 h-40 bg-gray-200 rounded-full overflow-hidden border-8 border-white">
+            <div className="w-40 h-40 bg-Rust-200 rounded-full overflow-hidden border-8 border-white">
               {hotel.photos?.[1] ? (
                 <img src={`http://localhost:3000${hotel.photos[1]}`} alt={hotel.nom} className="w-full h-full object-cover" />
               ) : (
-                <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-500 to-purple-600">
+                <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-500 to-teal-600">
                   <Building2 size={70} className="text-white" />
                 </div>
               )}

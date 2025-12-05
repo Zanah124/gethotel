@@ -19,7 +19,7 @@ const SuperDashboard = () => {
             Bienvenue, Super Admin
           </h1>
           <p className="text-xl opacity-90">
-            Gérez tous les hôtels de la plateforme Palace Madagascar
+            Gérez tous les hôtels de la plateforme GetHotel Madagascar
           </p>
         </div>
       </div>
