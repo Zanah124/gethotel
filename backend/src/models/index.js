@@ -9,7 +9,7 @@ import Hotel from './Hotel.js';
 // import Subscription from './Subscription.js';
 // import Payment from './Payment.js';
 // import Invoice from './Invoice.js';
-// import Employee from './Employee.js';
+ import Employee from './Employee.js';
 // import Client from './Client.js';
 // import TypeChambre from './TypeChambre.js';
 // import Chambre from './Chambre.js';
@@ -31,6 +31,15 @@ import CategorieStock from './CategorieStock.js';
 User.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
 Hotel.hasMany(User, { foreignKey: 'hotel_id', as: 'users' });
 
+//Hotel <-> Employee
+Hotel.hasMany(Employee, { foreignKey: 'hotel_id', as: 'employees' });
+Employee.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
+
+// User <-> Employee
+User.hasOne(Employee, { foreignKey: 'user_id', as: 'employeeProfile' });
+Employee.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+
 // TOUTES LES AUTRES RELATIONS SONT COMMENTÉES
 // Décommentez-les au fur et à mesure que vous créez les modèles
 
@@ -51,13 +60,6 @@ Payment.belongsTo(Subscription, { foreignKey: 'subscription_id', as: 'subscripti
 Subscription.hasMany(Invoice, { foreignKey: 'subscription_id', as: 'invoices' });
 Invoice.belongsTo(Subscription, { foreignKey: 'subscription_id', as: 'subscription' });
 
-// Hotel <-> Employee
-Hotel.hasMany(Employee, { foreignKey: 'hotel_id', as: 'employees' });
-Employee.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
-
-// User <-> Employee
-User.hasOne(Employee, { foreignKey: 'user_id', as: 'employeeProfile' });
-Employee.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 // User <-> Client
 User.hasOne(Client, { foreignKey: 'user_id', as: 'clientProfile' });
@@ -126,7 +128,8 @@ const db = {
   Hotel,
   Stock,
   MouvementStock,
-  CategorieStock
+  CategorieStock,
+  Employee
   
   // Ajoutez les autres modèles au fur et à mesure
   /*
@@ -134,7 +137,7 @@ const db = {
   Subscription,
   Payment,
   Invoice,
-  Employee,
+  
   Client,
   TypeChambre,
   Chambre,

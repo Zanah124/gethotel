@@ -1,5 +1,3 @@
-// src/components/auth/LoginForm.jsx   (ou là où tu l’as placé)
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth'; 
@@ -42,6 +40,8 @@ export default function LoginForm() {
         navigate('/super/dashboard');
       } else if (user.role === 'admin' || user.role === 'admin_hotel') {
         navigate('/admin/dashboard');
+      } else if (user.role === 'employee' || user.role === 'employee') {
+        navigate('/employee/dashboard');
       } else if (user.role === 'client') {
         navigate('/client/dashboard');
       } else {
@@ -94,9 +94,9 @@ export default function LoginForm() {
       </div>
 
       <div className="text-right mb-6">
-        <a href="#" className="text-indigo-600 text-sm hover:underline">
-          Mot de passe oublié ?
-        </a>
+      <Link to="/forgot-password" className="text-indigo-600 text-sm hover:underline">
+           Mot de passe oublié ?
+      </Link>
       </div>
 
       <button

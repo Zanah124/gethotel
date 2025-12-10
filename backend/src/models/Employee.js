@@ -28,26 +28,32 @@ const Employee = sequelize.define('Employee', {
     type: DataTypes.STRING(100),
     allowNull: false
   },
+  
+  salaire_mensuel: {                    
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    field: 'salaire_mensuel'            
+  },
+
+  contrat_type: { 
+    type: DataTypes.ENUM('CDI', 'CDD', 'Stage', 'Intérim'),
+    defaultValue: 'CDI'
+  },
+
   departement: {
     type: DataTypes.STRING(100),
-    allowNull: true
-  },
-  salaire: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: true
+    allowNull: false,           // ou true si tu veux autoriser NULL
+    defaultValue: 'Non défini', // optionnel : valeur par défaut
+    comment: 'Réception, Housekeeping, Restauration, Technique, etc.'
   },
   date_embauche: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
   },
-  contrat_type: {
-    type: DataTypes.ENUM('CDI', 'CDD', 'stage', 'interim'),
-    allowNull: false,
-    defaultValue: 'CDI'
-  },
+  
   statut: {
-    type: DataTypes.ENUM('actif', 'conge', 'inactif'),
+    type: DataTypes.ENUM('actif', 'inactif', 'en_congé'),
     defaultValue: 'actif'
   }
 }, {

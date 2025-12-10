@@ -2,7 +2,6 @@ import Hotel from '../../models/Hotel.js';
 import User from '../../models/User.js';
 import Subscription from '../../models/Subscription.js';
 import SubscriptionPlan from '../../models/SubscriptionPlan.js';
-import bcrypt from 'bcryptjs'; // ✅ Ajouter cet import en haut
 import { Op } from 'sequelize';
 
 /**
@@ -175,16 +174,14 @@ export const createHotel = async (req, res) => {
       is_active: true
     });
 
-    // ✅ Hasher le mot de passe correctement
-    const hashedPassword = await bcrypt.hash(admin_password, 10);
-
-    // Créer l'utilisateur admin de l'hôtel
+    // ✅ Créer l'utilisateur admin de l'hôtel
+    // Le mot de passe est passé EN CLAIR - le hook beforeCreate dans User.js le hachera automatiquement
     const adminUser = await User.create({
       nom: admin_nom,
       prenom: admin_prenom,
       email: admin_email,
       telephone: admin_telephone,
-      password: hashedPassword,
+      password: admin_password, // ✅ EN CLAIR - sera haché par le hook
       role: 'admin',
       hotel_id: hotel.id,
       statut: 'actif'

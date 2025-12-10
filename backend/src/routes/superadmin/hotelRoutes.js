@@ -18,12 +18,12 @@ const router = express.Router();
 router.use(auth, roleCheck(['superadmin']));
 
 // CRUD des hôtels
-router.get('/', getAllHotels);                    // GET /api/superadmin/hotels
-router.get('/:id', getHotelById);                 // GET /api/superadmin/hotels/:id
-router.post('/', createHotel);                    // POST /api/superadmin/hotels
-router.put('/:id', updateHotel);                  // PUT /api/superadmin/hotels/:id
-router.patch('/:id/deactivate', deactivateHotel); // PATCH /api/superadmin/hotels/:id/deactivate
-router.patch('/:id/activate', activateHotel);     // PATCH /api/superadmin/hotels/:id/activate
-router.delete('/:id', deleteHotel);               // DELETE /api/superadmin/hotels/:id
+router.get('/', getAllHotels);                    
+router.get('/:id', getHotelById);                 
+router.post('/', createHotel);                   
+router.put('/:id', updateHotel);                
+router.patch('/:id/deactivate', deactivateHotel); 
+router.patch('/:id/activate', activateHotel);    
+router.delete('/:id', deleteHotel);              
 
 export default router;

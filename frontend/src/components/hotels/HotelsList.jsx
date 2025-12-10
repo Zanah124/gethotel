@@ -54,6 +54,50 @@ const HotelsList = () => {
     }
   };
 
+  const handleDelete = async (hotelId, hotelName) => {
+    // Confirmation élégante avec le nom de l'hôtel
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer définitivement l'hôtel "${hotelName}" ?\n\nCette action est irréversible !`)) {
+      return;
+    }
+  
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+  
+      await api.delete(`/superadmin/hotels/${hotelId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+  
+      await fetchHotels();
+  
+      alert(`Hôtel "${hotelName}" supprimé avec succès`);
+    } catch (err) {
+      console.error('Erreur suppression:', err);
+      const message = err.response?.data?.message || 'Impossible de supprimer l\'hôtel';
+      alert(`Erreur : ${message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleActive = async (hotelId, currentStatus) => {
+    if (!window.confirm(`Voulez-vous vraiment ${currentStatus ? 'désactiver' : 'activer'} cet hôtel ?`)) {
+      return;
+    }
+  
+    try {
+      const endpoint = currentStatus ? `/superadmin/hotels/${hotelId}/deactivate` : `/superadmin/hotels/${hotelId}/activate`;
+      await api.put(endpoint, {}, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+  
+      await fetchHotels(); // ou mise à jour locale
+    } catch (err) {
+      console.error(err)
+      alert('Erreur lors de la modification du statut');
+    }
+  };
+
   useEffect(() => {
     fetchHotels();
   }, [page, search]);
@@ -168,11 +212,19 @@ const HotelsList = () => {
                         <button className="p-2 hover:bg-gray-100 rounded-lg transition">
                           <Edit size={18} className="text-gray-600" />
                         </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-                          <ToggleLeft size={18} className={hotel.is_active ? 'text-green-600' : 'text-red-600'} />
+                        <button 
+                            onClick={() => handleToggleActive(hotel.id, hotel.is_active)} // Tu peux aussi implémenter ça
+                            className="p-2 hover:bg-gray-100 rounded-lg transition group"
+                            title={hotel.is_active ? 'Désactiver' : 'Activer'}
+                        >
+                            <ToggleLeft size={18} className={hotel.is_active ? 'text-green-600' : 'text-red-600'} />
                         </button>
-                        <button className="p-2 hover:bg-red-50 rounded-lg transition">
-                          <Trash2 size={18} className="text-red-600" />
+                        <button
+                            onClick={() => handleDelete(hotel.id, hotel.nom)}
+                           className="p-2 hover:bg-red-50 rounded-lg transition group"
+                            title="Supprimer l'hôtel"
+                        >
+                            <Trash2 size={18} className="text-red-600 group-hover:text-red-700" />
                         </button>
                       </div>
                     </td>

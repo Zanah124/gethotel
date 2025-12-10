@@ -19,6 +19,9 @@ import Register from './pages/auth/Register.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
 import EditHotelProfile from './components/admin/EditHotelProfile.jsx';
 import Hotels from './pages/admin/Hotels.jsx';
+import Employee from './pages/admin/Employee.jsx';
+import AddEmployeeForm from './components/admin/AddEmployeeForm.jsx';
+import EditEmployeeForm from './components/admin/EditEmployeeForm.jsx';
 
 // pages superadmin
 import { SuperAdminRoute } from './components/superadmin/ProtectedRoute.jsx';
@@ -68,10 +71,11 @@ const AppContent = () => {
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/hotels" element={<Hotels />} />
           <Route path="/admin/hotel/edit" element={<EditHotelProfile />} />
+          <Route path="/admin/employees" element={<Employee />} />
+          <Route path="/admin/employees/add" element={<AddEmployeeForm />} />
+          <Route path="/admin/employees/edit/:id" element={<EditEmployeeForm />} />
 
           {/* Super Admin → tout sous /super */}
-          
-
           <Route
             path="/super/*"
             element={
