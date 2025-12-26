@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider} from './context/AuthProvider';
@@ -9,11 +8,19 @@ import { useAuth } from './context/useAuth';
 import Navbar from './components/layout/Navbar';
 import NavbarAdmin from './components/layout/NavbarAdmin.jsx';
 import NavbarSuper from './components/layout/NavbarSuper.jsx';
+import NavbarEmployeeHorizontal from './components/layout/NavbarEmployeeHorizontal.jsx';
 
 // Pages public 
 import Home from './pages/client/Home';
 import Login from './pages/auth/Login.jsx';
 import Register from './pages/auth/Register.jsx';
+
+//Pages employee
+import Stock from './pages/employee/stock.jsx';
+import AddProduitModal from './components/stock/AddProduitModal.jsx';
+import MouvementModal from './components/stock/MouvementModal.jsx';
+import CategorieModal from './components/stock/CategorieModal.jsx';
+import EmployeeChambresDashboard from './components/employees/EmployeeChambresDashboard.jsx';
 
 // pages admin
 import Dashboard from './pages/admin/Dashboard.jsx';
@@ -22,12 +29,19 @@ import Hotels from './pages/admin/Hotels.jsx';
 import Employee from './pages/admin/Employee.jsx';
 import AddEmployeeForm from './components/admin/AddEmployeeForm.jsx';
 import EditEmployeeForm from './components/admin/EditEmployeeForm.jsx';
+import TypeChambreManager from './components/chambres/TypeChambreManager.jsx';
+import ChambresDashboard from './components/admin/ChambresDashboard.jsx';
+import AddChambreForm from './components/admin/AddChambreForm.jsx';
+import EditChambreForm from './components/admin/EditChambreForm.jsx';
+import StockDashboard from './pages/admin/StockDashboard.jsx';
+
 
 // pages superadmin
 import { SuperAdminRoute } from './components/superadmin/ProtectedRoute.jsx';
 import MenuSuper from './pages/superadmin/MenuSuper.jsx';
 import HotelsG from './pages/superadmin/HotelsG.jsx';
 import CreateHotel from './components/superadmin/CreateHotel.jsx';
+
 
 const AppContent = () => {
   const location = useLocation();
@@ -45,6 +59,7 @@ const AppContent = () => {
   const isAuthPage = ['/login', '/register'].includes(path);
   const isSuperPath = path.startsWith('/super');
   const isAdminPath = path.startsWith('/admin');
+  const isEmployeePath = path.startsWith('/employee');
 
   let ActiveNavbar = Navbar;
 
@@ -54,6 +69,8 @@ const AppContent = () => {
     ActiveNavbar = NavbarSuper;
   } else if (isAdminPath && ['admin', 'admin_hotel'].includes(user?.role)) {
     ActiveNavbar = NavbarAdmin;
+  } else if (isEmployeePath && ['employee'].includes(user?.role)) {
+    ActiveNavbar = NavbarEmployeeHorizontal;
   }
 
   return (
@@ -67,6 +84,13 @@ const AppContent = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
+          {/* Employee hôtel */}
+          <Route path="/employee/stock" element={<Stock />} />
+          <Route path="/employee/stock/create" element={<AddProduitModal />} />
+          <Route path="/employee/stock/mouvements" element={<MouvementModal />} />
+          <Route path="/employee/stock/categories" element={<CategorieModal />} />
+          <Route path="/employee/chambres" element={<EmployeeChambresDashboard />} />
+
           {/* Admin hôtel */}
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/hotels" element={<Hotels />} />
@@ -74,6 +98,11 @@ const AppContent = () => {
           <Route path="/admin/employees" element={<Employee />} />
           <Route path="/admin/employees/add" element={<AddEmployeeForm />} />
           <Route path="/admin/employees/edit/:id" element={<EditEmployeeForm />} />
+          <Route path="/admin/types-chambre" element={<TypeChambreManager />} />
+          <Route path="/admin/chambres" element={<ChambresDashboard />} />
+          <Route path="/admin/chambres/add" element={<AddChambreForm />} />
+          <Route path="/admin/chambres/edit/:id" element={<EditChambreForm />} />
+          <Route path="/admin/stock" element={<StockDashboard />} />
 
           {/* Super Admin → tout sous /super */}
           <Route

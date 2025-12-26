@@ -7,13 +7,15 @@ const EditHotelProfile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
   const [success, setSuccess] = useState('');
 
   const [formData, setFormData] = useState({
     nom: '', adresse: '', ville: '', pays: 'Madagascar', codePostal: '',
     telephone: '', email: '', description: '', etoiles: 5,
     equipements: [], services: [], politiqueAnnulation: '',
-    photo_principale: null
+    photo_principale: null,
+    photos: []
   });
 
   useEffect(() => {
@@ -38,7 +40,8 @@ const EditHotelProfile = () => {
         equipements: data.equipements || [],
         services: data.services || [],
         politiqueAnnulation: data.politique_annulation || '',
-        photo_principale: data.photo_principale || null
+        photo_principale: data.photo_principale || null,
+        photos: data.photos || []
       });
     } catch (error) {                 // ← CORRIGÉ
       console.error('Erreur chargement hôtel:', error);
@@ -77,6 +80,38 @@ const EditHotelProfile = () => {
       alert('Impossible d\'uploader l\'image');
     } finally {
       setUploading(false);
+    }
+  };
+
+  // UPLOAD BANNIÈRE
+  const handleBannerUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formDataUpload = new FormData();
+    formDataUpload.append('banner', file);
+
+    setUploadingBanner(true);
+    try {
+      const res = await api.post('/admin/hotel/banner', formDataUpload);
+      const newBanner = res.data.banner || res.data.photos?.[0];
+
+      // Mettre à jour les photos dans formData
+      const currentPhotos = formData.photos || [];
+      if (currentPhotos.length > 0) {
+        currentPhotos[0] = newBanner;
+      } else {
+        currentPhotos.push(newBanner);
+      }
+
+      setFormData(prev => ({ ...prev, photos: currentPhotos }));
+      setSuccess('Bannière mise à jour avec succès !');
+      setTimeout(() => setSuccess(''), 4000);
+    } catch (error) {
+      console.error('Erreur upload bannière:', error);
+      alert('Impossible d\'uploader la bannière');
+    } finally {
+      setUploadingBanner(false);
     }
   };
 
@@ -129,6 +164,47 @@ const EditHotelProfile = () => {
                 {success}
               </div>
             )}
+
+            {/* BANNIÈRE */}
+            <div>
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <Camera /> Image de bannière
+              </h3>
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
+                {formData.photos?.[0] ? (
+                  <div className="space-y-6">
+                    <img
+                      src={`${baseUrl}${formData.photos[0]}`}
+                      alt="Bannière"
+                      className="w-full max-w-4xl h-64 object-cover rounded-xl mx-auto shadow-lg"
+                    />
+                    <label className="cursor-pointer inline-flex items-center gap-2 bg-[#49B9FF] text-white py-3 px-8 rounded-full hover:bg-blue-600">
+                      <Upload size={20} /> Changer la bannière
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleBannerUpload}
+                        className="hidden"
+                        disabled={uploadingBanner}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <label className="cursor-pointer">
+                    <Upload size={64} className="mx-auto mb-4 text-gray-400" />
+                    <p className="text-gray-600">Cliquez pour ajouter une bannière</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleBannerUpload}
+                      className="hidden"
+                      disabled={uploadingBanner}
+                    />
+                  </label>
+                )}
+                {uploadingBanner && <p className="text-blue-600 mt-4">Upload en cours…</p>}
+              </div>
+            </div>
 
             {/* PHOTO PRINCIPALE */}
             <div>

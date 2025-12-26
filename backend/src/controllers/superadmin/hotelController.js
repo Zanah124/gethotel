@@ -181,7 +181,7 @@ export const createHotel = async (req, res) => {
       prenom: admin_prenom,
       email: admin_email,
       telephone: admin_telephone,
-      password: admin_password, // ✅ EN CLAIR - sera haché par le hook
+      password: admin_password, 
       role: 'admin',
       hotel_id: hotel.id,
       statut: 'actif'

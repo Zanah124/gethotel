@@ -1,11 +1,11 @@
-// backend/src/routes/employee/stock/stockRoutes.js
 import express from 'express';
 import {
   getAllStock,
   getStockById,
   createMouvement,
   getMouvementsByStockId,
-  getLowStockAlerts
+  getLowStockAlerts,
+  createStock
 } from '../../../controllers/stock/stockController.js';
 import { auth } from '../../../middleware/auth.js';
 import { roleCheck } from '../../../middleware/roleCheck.js';
@@ -24,5 +24,8 @@ router.get('/:id', getStockById);
 // Routes mouvements (entrée/sortie uniquement)
 router.post('/mouvements', createMouvement);
 router.get('/:stock_id/mouvements', getMouvementsByStockId);
+
+// Routes créer un stock 
+router.post('/create', createStock);
 
 export default router;

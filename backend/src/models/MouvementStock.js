@@ -1,7 +1,22 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database.js';
 
-class MouvementStock extends Model {}
+class MouvementStock extends Model {
+  // Méthode pour définir les associations
+  static associate(models) {
+    // Association avec Stock
+    this.belongsTo(models.Stock, {
+      foreignKey: 'stock_id',
+      as: 'stock'
+    });
+    
+    // Association avec User (employé qui a effectué le mouvement)
+    this.belongsTo(models.User, {
+      foreignKey: 'effectue_par',
+      as: 'employee'
+    });
+  }
+}
 
 MouvementStock.init(
   {
@@ -36,7 +51,7 @@ MouvementStock.init(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'users', // ou 'employees' si tu as une table séparée
+        model: 'users',
         key: 'id'
       }
     },
@@ -48,7 +63,7 @@ MouvementStock.init(
   {
     sequelize,
     tableName: 'mouvements_stock',
-    timestamps: false // tout est géré par date_mouvement + DEFAULT CURRENT_TIMESTAMP
+    timestamps: false
   }
 );
 

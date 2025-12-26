@@ -11,8 +11,8 @@ import Hotel from './Hotel.js';
 // import Invoice from './Invoice.js';
  import Employee from './Employee.js';
 // import Client from './Client.js';
-// import TypeChambre from './TypeChambre.js';
-// import Chambre from './Chambre.js';
+ import TypeChambre from './TypeChambre.js';
+import Chambre from './Chambre.js';
 // import Reservation from './Reservation.js';
 // import PaiementClient from './PaiementClient.js';
 // import FactureClient from './FactureClient.js';
@@ -39,6 +39,17 @@ Employee.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
 User.hasOne(Employee, { foreignKey: 'user_id', as: 'employeeProfile' });
 Employee.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
+// Hotel <-> Chambre 
+Hotel.hasMany(Chambre, { foreignKey: 'hotel_id', as: 'chambres' });
+Chambre.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
+
+// Hotel <-> TypeChambre 
+Hotel.hasMany(TypeChambre, { foreignKey: 'hotel_id', as: 'typesChambre' });  // changé de 'typeChambre' → 'typesChambre'
+TypeChambre.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
+
+// TypeChambre <-> Chambre 
+TypeChambre.hasMany(Chambre, { foreignKey: 'type_chambre_id', as: 'chambres' });
+Chambre.belongsTo(TypeChambre, { foreignKey: 'type_chambre_id', as: 'typeChambre' });  // ← ICI : 'hotel' → 'typeChambre'
 
 // TOUTES LES AUTRES RELATIONS SONT COMMENTÉES
 // Décommentez-les au fur et à mesure que vous créez les modèles
@@ -65,17 +76,7 @@ Invoice.belongsTo(Subscription, { foreignKey: 'subscription_id', as: 'subscripti
 User.hasOne(Client, { foreignKey: 'user_id', as: 'clientProfile' });
 Client.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
-// Hotel <-> TypeChambre
-Hotel.hasMany(TypeChambre, { foreignKey: 'hotel_id', as: 'typeChambres' });
-TypeChambre.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
 
-// TypeChambre <-> Chambre
-TypeChambre.hasMany(Chambre, { foreignKey: 'type_id', as: 'chambres' });
-Chambre.belongsTo(TypeChambre, { foreignKey: 'type_id', as: 'type' });
-
-// Hotel <-> Chambre
-Hotel.hasMany(Chambre, { foreignKey: 'hotel_id', as: 'chambres' });
-Chambre.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
 
 // Chambre <-> Reservation
 Chambre.hasMany(Reservation, { foreignKey: 'chambre_id', as: 'reservations' });
@@ -104,6 +105,9 @@ Stock.belongsTo(CategorieStock, { foreignKey: 'categorie_id' });
 Stock.hasMany(MouvementStock, { foreignKey: 'stock_id', onDelete: 'CASCADE' });
 MouvementStock.belongsTo(Stock, { foreignKey: 'stock_id' });
 
+User.hasMany(MouvementStock, { foreignKey: 'effectue_par', as: 'mouvements' });
+MouvementStock.belongsTo(User, { foreignKey: 'effectue_par', as: 'employee' });
+
 /*
 // Employee <-> PlanningEmployee
 Employee.hasMany(PlanningEmployee, { foreignKey: 'employee_id', as: 'plannings' });
@@ -129,8 +133,9 @@ const db = {
   Stock,
   MouvementStock,
   CategorieStock,
-  Employee
-  
+  Employee,
+  Chambre,
+  TypeChambre
   // Ajoutez les autres modèles au fur et à mesure
   /*
   SubscriptionPlan,
@@ -139,8 +144,8 @@ const db = {
   Invoice,
   
   Client,
-  TypeChambre,
-  Chambre,
+  
+  
   Reservation,
   PaiementClient,
   FactureClient,  */

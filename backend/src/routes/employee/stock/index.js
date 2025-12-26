@@ -1,9 +1,9 @@
 import express from 'express';
-import stockRoutes from './stockRoutes.js';
 import categorieStockRoutes from './categorieStockRoutes.js';
+import stockRoutes from './stockRoutes.js';
 
 const router = express.Router();
-router.use('/stock', stockRoutes);
-router.use('/categories-stock', categorieStockRoutes);
+router.use('/categories', categorieStockRoutes);
+router.use('/', stockRoutes);
 
 export default router;

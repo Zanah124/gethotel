@@ -9,8 +9,8 @@ import { roleCheck } from '../../../middleware/roleCheck.js';
 import { hotelAccess } from '../../../middleware/hotelAccess.js';
 
 const router = express.Router();
-router.use(auth, roleCheck(['employee']), hotelAccess);
 
+router.use(auth, roleCheck(['employee', 'admin']), hotelAccess);
 
 router.get('/', getAllCategories);
 router.post('/', createCategorie);

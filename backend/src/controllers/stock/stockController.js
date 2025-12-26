@@ -1,12 +1,20 @@
 import Stock from '../../models/Stock.js';
 import MouvementStock from '../../models/MouvementStock.js';
 import CategorieStock from '../../models/CategorieStock.js';
+import User from '../../models/User.js'; // ⭐ AJOUT DE CETTE LIGNE
 import { Op } from 'sequelize';
 import sequelize from '../../config/database.js';
 
 // Lister les articles (consultation)
 export const getAllStock = async (req, res) => {
   try {
+    if (!req.hotelId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Hotel ID manquant'
+      });
+    }
+
     const { page = 1, limit = 20, search = '', categorie_id } = req.query;
     const offset = (page - 1) * limit;
 
@@ -154,10 +162,17 @@ export const getMouvementsByStockId = async (req, res) => {
 
     const { count, rows } = await MouvementStock.findAndCountAll({
       where: { stock_id: req.params.stock_id },
-      include: [{
-        model: Stock,
-        attributes: ['nom_article', 'unite_mesure']
-      }],
+      include: [
+        {
+          model: Stock,
+          attributes: ['nom_article', 'unite_mesure']
+        },
+        {
+          model: User,
+          as: 'employee', // ← Utiliser l'alias défini dans index.js
+          attributes: ['id', 'nom', 'prenom', 'email']
+        }
+      ],
       order: [['date_mouvement', 'DESC']],
       limit: parseInt(limit),
       offset
@@ -180,6 +195,13 @@ export const getMouvementsByStockId = async (req, res) => {
 // Alertes stock faible
 export const getLowStockAlerts = async (req, res) => {
   try {
+    if (!req.hotelId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Hotel ID manquant'
+      });
+    }
+
     const alerts = await Stock.findAll({
       where: {
         hotel_id: req.hotelId,
@@ -290,12 +312,19 @@ export const exportStockReport = async (req, res) => {
 // Statistiques stock
 export const getStockStats = async (req, res) => {
   try {
+    if (!req.hotelId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Hotel ID manquant'
+      });
+    }
+
     const stats = await Stock.findAll({
       where: { hotel_id: req.hotelId },
       attributes: [
         [sequelize.fn('COUNT', sequelize.col('id')), 'total_articles'],
         [sequelize.fn('SUM', sequelize.col('quantite_actuelle')), 'quantite_totale'],
-        [sequelize.fn('SUM', sequelize.literal('quantite_actuelle * prix_unitaire')), 'valeur_totale']
+        [sequelize.fn('SUM', sequelize.literal('COALESCE(quantite_actuelle * prix_unitaire, 0)')), 'valeur_totale']
       ],
       raw: true
     });
@@ -315,20 +344,30 @@ export const getStockStats = async (req, res) => {
       }],
       where: {
         date_mouvement: {
-          [Op.gte]: sequelize.literal("NOW() - INTERVAL '7 days'")
+          [Op.gte]: sequelize.literal("DATE_SUB(NOW(), INTERVAL 7 DAY)")
         }
       }
     });
 
+    // Gérer le cas où il n'y a pas de stock
+    const statsData = stats[0] || {
+      total_articles: '0',
+      quantite_totale: null,
+      valeur_totale: null
+    };
+
     res.json({
       success: true,
       data: {
-        ...stats[0],
-        articles_stock_faible: lowStock,
-        mouvements_7_jours: recentMouvements
+        total_articles: parseInt(statsData.total_articles) || 0,
+        quantite_totale: parseFloat(statsData.quantite_totale) || 0,
+        valeur_totale: parseFloat(statsData.valeur_totale) || 0,
+        articles_stock_faible: lowStock || 0,
+        mouvements_7_jours: recentMouvements || 0
       }
     });
   } catch (error) {
+    console.error('Erreur getStockStats:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

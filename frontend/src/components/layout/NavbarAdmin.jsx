@@ -20,6 +20,7 @@ const NavbarAdmin = () => {
   const navLinks = [
     { name: 'Dashboard', path: '/admin/dashboard' },
     { name: 'Hôtels', path: '/admin/hotels' },
+    { name: 'Chambre', path: '/admin/chambres' },
     { name: 'Employés', path: '/admin/employees' },
     { name: 'Réservations', path: '/admin/reservations' },
     { name: 'Stock', path: '/admin/stock' },

@@ -1,9 +1,15 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-// Crée le dossier s'il n'existe pas
-const uploadDir = 'uploads/hotels';
+// Obtenir le chemin absolu du fichier actuel
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Crée le dossier s'il n'existe pas (chemin absolu depuis le backend)
+const uploadDir = path.join(__dirname, '../../uploads/hotels');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
