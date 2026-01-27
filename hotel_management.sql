@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le :  sam. 29 nov. 2025 à 15:32
+-- Généré le :  lun. 26 jan. 2026 à 08:17
 -- Version du serveur :  5.7.17
 -- Version de PHP :  5.6.30
 
@@ -21,8 +21,6 @@ SET time_zone = "+00:00";
 --
 -- Base de données :  `hotel_management`
 --
-CREATE DATABASE IF NOT EXISTS `hotel_management` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `hotel_management`;
 
 -- --------------------------------------------------------
 
@@ -35,14 +33,14 @@ CREATE TABLE `categories_stock` (
   `nom` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
   `created_at` datetime NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `categories_stock`
 --
 
 INSERT INTO `categories_stock` (`id`, `nom`, `description`, `created_at`) VALUES
-(1, 'Produits ménagers', 'produits nettoyage, ménagers', '2025-11-25 16:09:09');
+(1, 'Produit ménager', 'pour le ménage', '2026-01-23 11:38:27');
 
 -- --------------------------------------------------------
 
@@ -61,6 +59,13 @@ CREATE TABLE `chambres` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `chambres`
+--
+
+INSERT INTO `chambres` (`id`, `hotel_id`, `type_chambre_id`, `numero_chambre`, `etage`, `statut`, `notes`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, '102', 1, 'disponible', 'Vue sur jardin', '2026-01-23 13:35:05', '2026-01-23 13:35:22');
 
 -- --------------------------------------------------------
 
@@ -112,20 +117,26 @@ CREATE TABLE `conges_employees` (
 
 CREATE TABLE `employees` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `hotel_id` int(11) DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `hotel_id` int(11) NOT NULL,
   `poste` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `date_embauche` date NOT NULL,
+  `departement` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `salaire_mensuel` decimal(10,2) DEFAULT NULL,
-  `numero_cnaps` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `numero_cin` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `adresse` text COLLATE utf8mb4_unicode_ci,
-  `contact_urgence` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `telephone_urgence` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT '1',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `date_embauche` datetime NOT NULL,
+  `contrat_type` enum('CDI','CDD','stage','interim') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'CDI',
+  `statut` enum('actif','conge','inactif') COLLATE utf8mb4_unicode_ci DEFAULT 'actif',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `employees`
+--
+
+INSERT INTO `employees` (`id`, `user_id`, `hotel_id`, `poste`, `departement`, `salaire_mensuel`, `date_embauche`, `contrat_type`, `statut`, `created_at`, `updated_at`) VALUES
+(3, 8, 1, 'Réceptionniste', 'Accueil', '10000.00', '2025-10-02 03:00:00', 'CDI', 'actif', '2025-12-08 22:50:37', '2025-12-08 22:50:37'),
+(5, 12, 1, 'Agent de sécurité', 'Sécurité', '130000.00', '2025-09-01 03:00:00', 'interim', 'actif', '2025-12-09 14:07:55', '2025-12-09 14:07:55'),
+(6, 14, 1, 'Réceptionniste', 'Hébergement', '200000.00', '2026-01-23 03:00:00', 'interim', 'actif', '2026-01-23 11:35:37', '2026-01-23 11:35:37');
 
 -- --------------------------------------------------------
 
@@ -139,29 +150,30 @@ CREATE TABLE `hotels` (
   `adresse` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `ville` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `pays` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT 'Madagascar',
+  `code_postal` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `telephone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
   `nombre_etoiles` int(11) DEFAULT NULL,
   `photo_principale` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `admin_hotel_id` int(11) DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT '1',
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL,
-  `code_postal` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `photos` json DEFAULT NULL,
   `equipements` json DEFAULT NULL,
   `services` json DEFAULT NULL,
-  `politique_annulation` text COLLATE utf8mb4_unicode_ci
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `politique_annulation` text COLLATE utf8mb4_unicode_ci,
+  `admin_hotel_id` int(11) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT '1',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `hotels`
 --
 
-INSERT INTO `hotels` (`id`, `nom`, `adresse`, `ville`, `pays`, `telephone`, `email`, `description`, `nombre_etoiles`, `photo_principale`, `admin_hotel_id`, `is_active`, `created_at`, `updated_at`, `code_postal`, `photos`, `equipements`, `services`, `politique_annulation`) VALUES
-(3, 'Palace Madagascar', 'Lot log41 rue Richard', 'Mahajanga', 'Madagascar', '034 12 345 67', 'contact@palace.mg', 'Le meilleur hôtel 5 étoiles de Mahajanga', 5, NULL, 3, 1, '2025-11-24 16:58:46', '2025-11-24 16:58:46', '401', NULL, '[\"WiFi\", \"Piscine\", \"Restaurant\", \"Spa\", \"Parking\", \"Gym\", \"Bar\"]', '[\"Room service\", \"Blanchisserie\", \"Navette aéroport\", \"Petit-déjeuner inclus\", \"Service de conciergerie\"]', 'Annulation gratuite jusqu\'à 48h avant l\'arrivée'),
-(2, 'Palace Madagascar', 'Lot log41 rue Richard', 'Mahajanga', 'Madagascar', '034 12 345 67', 'contact@palace.mg', 'Le meilleur hôtel 5 étoiles de Tana', 5, NULL, 3, 1, '2025-11-24 16:32:41', '2025-11-24 16:32:41', '401', '[]', '[\"WiFi\", \"Piscine\", \"Restaurant\", \"Spa\"]', '[\"Room service\", \"Blanchisserie\", \"Navette aéroport\"]', 'Annulation gratuite jusqu\'à 48h avant l\'arrivée');
+INSERT INTO `hotels` (`id`, `nom`, `adresse`, `ville`, `pays`, `code_postal`, `telephone`, `email`, `description`, `nombre_etoiles`, `photo_principale`, `photos`, `equipements`, `services`, `politique_annulation`, `admin_hotel_id`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'Hôtel Le Louvre Madagascar', 'Lot II Y 42 Bis Ankorondrano', 'Mahajanga', 'Madagascar', '101', '+261 34 05 123 45', 'contact@louvre-mada.mg', 'Hôtel 4 étoiles au cœur d\'Antananarivo avec vue panoramique.', 4, '/uploads/hotels/1-1765357700414-426159006.jpg', '[\"/uploads/hotels/1-1769116025184-912427670.png\"]', '[\"wifi\", \"piscine\", \"spa\", \"parking\", \"restaurant\", \"salle_de_sport\"]', '[\"room_service\", \"blanchisserie\", \"conciergerie\"]', 'Annulation gratuite jusqu\'à 48h avant l\'arrivée.', 2, 1, '2025-12-06 19:27:56', '2026-01-23 00:07:14'),
+(2, 'Le royale Palace', 'Amborovy', 'Mahajanga', 'Madagascar', '401', '03267154378', 'royalepalace@gmail.com', '', 4, NULL, '[]', '[]', '[]', NULL, 11, 1, '2025-12-09 13:37:17', '2025-12-09 13:37:19'),
+(3, 'Salama hôtel', 'Mahabibo kely', 'Mahajanga', 'Madagascar', '401', '0329046270', 'salamahotel@gmail.com', 'un hôtel fait pour des touristes', 2, NULL, '[]', '[]', '[]', NULL, 15, 1, '2026-01-23 13:13:21', '2026-01-23 13:13:22');
 
 -- --------------------------------------------------------
 
@@ -171,13 +183,13 @@ INSERT INTO `hotels` (`id`, `nom`, `adresse`, `ville`, `pays`, `telephone`, `ema
 
 CREATE TABLE `mouvements_stock` (
   `id` int(11) NOT NULL,
-  `stock_id` int(11) DEFAULT NULL,
+  `stock_id` int(11) NOT NULL,
   `type_mouvement` enum('entree','sortie','ajustement') COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantite` int(11) NOT NULL,
   `motif` text COLLATE utf8mb4_unicode_ci,
   `effectue_par` int(11) DEFAULT NULL,
   `date_mouvement` datetime DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -231,8 +243,8 @@ CREATE TABLE `reservations` (
 
 CREATE TABLE `stock` (
   `id` int(11) NOT NULL,
-  `hotel_id` int(11) DEFAULT NULL,
-  `categorie_id` int(11) DEFAULT NULL,
+  `hotel_id` int(11) NOT NULL,
+  `categorie_id` int(11) NOT NULL,
   `nom_article` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
   `quantite_actuelle` int(11) DEFAULT '0',
@@ -243,23 +255,78 @@ CREATE TABLE `stock` (
   `derniere_commande` date DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Structure de la table `subscription_plans`
+-- Déchargement des données de la table `stock`
 --
--- Erreur de lecture de structure pour la table hotel_management.subscription_plans : #1146 - La table 'hotel_management.subscription_plans' n'existe pas
--- Erreur de lecture des données pour la table hotel_management.subscription_plans : #1064 - Erreur de syntaxe près de 'FROM `hotel_management`.`subscription_plans`' à la ligne 1
+
+INSERT INTO `stock` (`id`, `hotel_id`, `categorie_id`, `nom_article`, `description`, `quantite_actuelle`, `quantite_minimale`, `unite_mesure`, `prix_unitaire`, `fournisseur`, `derniere_commande`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 'Savon extra', 'Moyens', 8, 10, 'pièce', '2000.00', 'Damar', NULL, '2026-01-23 11:42:35', '2026-01-23 11:42:35');
 
 -- --------------------------------------------------------
 
 --
 -- Structure de la table `subscriptions`
 --
--- Erreur de lecture de structure pour la table hotel_management.subscriptions : #1146 - La table 'hotel_management.subscriptions' n'existe pas
--- Erreur de lecture des données pour la table hotel_management.subscriptions : #1064 - Erreur de syntaxe près de 'FROM `hotel_management`.`subscriptions`' à la ligne 1
+
+CREATE TABLE `subscriptions` (
+  `id` int(11) NOT NULL,
+  `hotel_id` int(11) NOT NULL,
+  `plan_id` int(11) NOT NULL,
+  `stripe_subscription_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('active','canceled','past_due','trialing','incomplete','incomplete_expired') COLLATE utf8mb4_unicode_ci DEFAULT 'trialing',
+  `current_period_start` datetime DEFAULT NULL,
+  `current_period_end` datetime DEFAULT NULL,
+  `trial_end` datetime DEFAULT NULL,
+  `canceled_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `subscription_plans`
+--
+
+CREATE TABLE `subscription_plans` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Basic, Premium, Enterprise',
+  `price_monthly` decimal(10,2) NOT NULL,
+  `price_yearly` decimal(10,2) NOT NULL,
+  `max_rooms` int(11) NOT NULL DEFAULT '10',
+  `max_employees` int(11) NOT NULL DEFAULT '5',
+  `max_storage_gb` int(11) DEFAULT '5',
+  `features` json DEFAULT NULL COMMENT 'ex: ["réservation en ligne", "paiement stripe", "statistiques avancées"]',
+  `is_active` tinyint(1) DEFAULT '1',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `type_chambres`
+--
+
+CREATE TABLE `type_chambres` (
+  `id` int(11) NOT NULL,
+  `hotel_id` int(11) NOT NULL,
+  `nom` varchar(50) NOT NULL,
+  `description` text,
+  `prix_par_nuit` decimal(10,2) NOT NULL,
+  `capacite` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Déchargement des données de la table `type_chambres`
+--
+
+INSERT INTO `type_chambres` (`id`, `hotel_id`, `nom`, `description`, `prix_par_nuit`, `capacite`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Double premium', 'Luxe et confort', '80000.00', 2, '2026-01-23 13:34:09', '2026-01-23 13:34:09');
 
 -- --------------------------------------------------------
 
@@ -281,18 +348,22 @@ CREATE TABLE `users` (
   `derniere_connexion` datetime DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `users`
 --
 
 INSERT INTO `users` (`id`, `nom`, `prenom`, `email`, `telephone`, `password`, `role`, `hotel_id`, `photo_profil`, `statut`, `derniere_connexion`, `created_at`, `updated_at`) VALUES
-(1, 'VOLOLONIAINA', 'Cendrine', 'caroelia@gmail.com', '+261328361449', '$2a$10$aemuWAmhWndpOdxEjt104ePjdw3eowJCUm6MbAvEI6r5bzWIFHRvq', 'client', NULL, NULL, 'actif', NULL, '2025-11-18 13:11:24', '2025-11-18 13:11:24'),
-(2, 'Alice', 'Bertinah', 'bertinahalice@gmail.com', '+2613267488412', '$2a$10$CTgtd0FtVl9lm6mGgs/AXuEQo4TyO3Ej7rBQ5nMgcHyEbwKbse4KK', 'client', NULL, NULL, 'actif', NULL, '2025-11-18 13:43:11', '2025-11-18 13:43:11'),
-(3, 'NY AINA', 'Avo', 'nyainaavo@gmail.com', '+261334517390', '$2a$10$8mJL99AfiGK.dSiCkTc0H.G2xG3ugTa9tZc77rFdDK/m.vZdfdI0i', 'admin', 3, NULL, 'actif', NULL, '2025-11-19 12:47:16', '2025-11-19 12:47:16'),
-(4, 'Lucie', 'Zanah', 'falimananaluciezanah@gmail.com', '+261328020750', '$2a$10$KcD8G7YeWNRgRG9At6af9e0LP94S6bB0OMOStUeTy8xFIW7yBLTVq', 'superadmin', NULL, NULL, 'actif', NULL, '2025-11-24 14:59:25', '2025-11-24 14:59:25'),
-(5, 'Rakoto', 'Jean', 'admin.palace@hotel.mg', '034 98 765 43', '$2a$10$KpjOGhYUz2FTILB93GCsJuOc7oDwEIUDHZJKYo3r2mMJkodtMMOJK', 'admin', 2, NULL, 'actif', NULL, '2025-11-24 16:32:41', '2025-11-24 16:32:41');
+(1, 'Lucie', 'Zanah', 'falimananaluciezanah@gmail.com', '+261328020750', '$2a$10$N1H5o0L0tfif5uXVk5180u0cZm5G37iH1vYvk6HCvkd7Ov0wGLrTS', 'superadmin', NULL, NULL, 'actif', NULL, '2025-12-06 16:53:24', '2025-12-06 16:53:24'),
+(2, 'NY AINA', 'Avo', 'nyainaavo@gmail.com', '+261334517390', '$2a$10$Q13AAMFZVzPREEBlwlQefOoLfg.pZHy9YZwqyKoUGRPCRW7aUEc1C', 'admin', 1, NULL, 'actif', NULL, '2025-12-06 16:53:53', '2025-12-06 16:53:53'),
+(8, 'Sambatra', 'Fy', 'sambatrafy@hotel.com', '329012708', '$2a$10$4bjwDXnZVtiZcpkjGTRiSOr4Vb0czaEYAdVyaLpRJ99bQWQ.Qp1ou', 'employee', 1, NULL, 'actif', NULL, '2025-12-08 22:50:37', '2025-12-08 22:50:37'),
+(9, 'Bertinah', 'Alice', 'alicebertinah@gmail.com', '0326713289', '$2a$10$pmwGX5XMTLU8GaAdcEij9.YkuyFe5Vgi8qqYK8B6oOKmJbQ0LRmkW', 'client', NULL, NULL, 'actif', NULL, '2025-12-09 11:51:44', '2025-12-09 11:51:44'),
+(11, 'Mamy', 'Velo', 'mamyvelo@gmail.com', '0382474912', '$2a$10$GTuCDUh6QDTqjHSIGzRfUeGWcdhxuL2jjqhSs8YbZj53Jaw/F.Kg.', 'admin', 2, NULL, 'actif', NULL, '2025-12-09 13:37:18', '2025-12-09 13:37:18'),
+(12, 'Toky', 'aina', 'tokyaina@gmail.com', '', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'employee', 1, NULL, 'actif', NULL, '2025-12-09 14:07:54', '2025-12-09 14:07:54'),
+(13, 'Cendrine', 'Elia', 'eliacendrine@gmail.com', '0328361449', '$2a$10$lzcTzQgWz/DpC3qkOTa4vemX4acDCBNxlGtgEu66eeNHGJ6tdzfr6', 'client', NULL, NULL, 'actif', NULL, '2026-01-23 11:25:04', '2026-01-23 11:25:04'),
+(14, 'Feno', 'Tiana', 'fenotiana@hotel.com', '0347648923', '$2a$10$7JMqhsI1dESEsWgHs9aa4.VUXMoMCyznSEO8GlxPibQhctZ4N62Zm', 'employee', 1, NULL, 'actif', NULL, '2026-01-23 11:35:37', '2026-01-23 11:35:37'),
+(15, 'Toussaint', 'Benjamin', 'toussaintbenjamin@gmail.com', '0347419132', '$2a$10$3qqFvfCc.QPhuhhh.VSODeQSoJZdijZRx./g3tnHrZ58FvQA5CE5i', 'admin', 3, NULL, 'actif', NULL, '2026-01-23 13:13:21', '2026-01-23 13:13:21');
 
 --
 -- Index pour les tables déchargées
@@ -332,7 +403,7 @@ ALTER TABLE `conges_employees`
 --
 ALTER TABLE `employees`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_id` (`user_id`,`hotel_id`),
+  ADD UNIQUE KEY `user_id` (`user_id`),
   ADD KEY `hotel_id` (`hotel_id`);
 
 --
@@ -378,19 +449,37 @@ ALTER TABLE `stock`
   ADD KEY `categorie_id` (`categorie_id`);
 
 --
+-- Index pour la table `subscriptions`
+--
+ALTER TABLE `subscriptions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `stripe_subscription_id` (`stripe_subscription_id`),
+  ADD UNIQUE KEY `stripe_subscription_id_2` (`stripe_subscription_id`),
+  ADD KEY `hotel_id` (`hotel_id`),
+  ADD KEY `plan_id` (`plan_id`);
+
+--
+-- Index pour la table `subscription_plans`
+--
+ALTER TABLE `subscription_plans`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD UNIQUE KEY `name_2` (`name`);
+
+--
+-- Index pour la table `type_chambres`
+--
+ALTER TABLE `type_chambres`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_type_chambre_hotel` (`hotel_id`);
+
+--
 -- Index pour la table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`),
   ADD UNIQUE KEY `email_2` (`email`),
-  ADD UNIQUE KEY `email_3` (`email`),
-  ADD UNIQUE KEY `email_4` (`email`),
-  ADD UNIQUE KEY `email_5` (`email`),
-  ADD UNIQUE KEY `email_6` (`email`),
-  ADD UNIQUE KEY `email_7` (`email`),
-  ADD UNIQUE KEY `email_8` (`email`),
-  ADD UNIQUE KEY `email_9` (`email`),
   ADD KEY `hotel_id` (`hotel_id`);
 
 --
@@ -406,7 +495,7 @@ ALTER TABLE `categories_stock`
 -- AUTO_INCREMENT pour la table `chambres`
 --
 ALTER TABLE `chambres`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT pour la table `clients`
 --
@@ -421,7 +510,7 @@ ALTER TABLE `conges_employees`
 -- AUTO_INCREMENT pour la table `employees`
 --
 ALTER TABLE `employees`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT pour la table `hotels`
 --
@@ -446,12 +535,77 @@ ALTER TABLE `reservations`
 -- AUTO_INCREMENT pour la table `stock`
 --
 ALTER TABLE `stock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+--
+-- AUTO_INCREMENT pour la table `subscriptions`
+--
+ALTER TABLE `subscriptions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT pour la table `subscription_plans`
+--
+ALTER TABLE `subscription_plans`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT pour la table `type_chambres`
+--
+ALTER TABLE `type_chambres`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;COMMIT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+--
+-- Contraintes pour les tables déchargées
+--
+
+--
+-- Contraintes pour la table `employees`
+--
+ALTER TABLE `employees`
+  ADD CONSTRAINT `employees_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `employees_ibfk_2` FOREIGN KEY (`hotel_id`) REFERENCES `hotels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `hotels`
+--
+ALTER TABLE `hotels`
+  ADD CONSTRAINT `hotels_ibfk_1` FOREIGN KEY (`admin_hotel_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `mouvements_stock`
+--
+ALTER TABLE `mouvements_stock`
+  ADD CONSTRAINT `mouvements_stock_ibfk_1` FOREIGN KEY (`stock_id`) REFERENCES `stock` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `mouvements_stock_ibfk_2` FOREIGN KEY (`effectue_par`) REFERENCES `users` (`id`);
+
+--
+-- Contraintes pour la table `stock`
+--
+ALTER TABLE `stock`
+  ADD CONSTRAINT `stock_ibfk_1` FOREIGN KEY (`hotel_id`) REFERENCES `hotels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `stock_ibfk_2` FOREIGN KEY (`categorie_id`) REFERENCES `categories_stock` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `subscriptions`
+--
+ALTER TABLE `subscriptions`
+  ADD CONSTRAINT `subscriptions_ibfk_1` FOREIGN KEY (`hotel_id`) REFERENCES `hotels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `subscriptions_ibfk_2` FOREIGN KEY (`plan_id`) REFERENCES `subscription_plans` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `type_chambres`
+--
+ALTER TABLE `type_chambres`
+  ADD CONSTRAINT `fk_type_chambre_hotel` FOREIGN KEY (`hotel_id`) REFERENCES `hotels` (`id`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`hotel_id`) REFERENCES `hotels` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

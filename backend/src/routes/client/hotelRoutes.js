@@ -1,14 +1,11 @@
-// backend/src/routes/client/hotelRoutes.js
-const express = require('express');
+import express from 'express';
+import { getHotels, getHotelById, getAvailableRooms } from '../../controllers/client/hotelController.js';
+
 const router = express.Router();
-const hotelController = require('../../controllers/client/hotelController');
-const { auth } = require('../../middleware/auth');
-const { roleCheck } = require('../../middleware/roleCheck');
 
-// Routes publiques (sans authentification)
-router.get('/search', hotelController.searchHotels);
-router.get('/popular', hotelController.getPopularHotels);
-router.get('/destinations', hotelController.getPopularDestinations);
-router.get('/:id', hotelController.getHotelDetails);
 
-module.exports = router;
+router.get('/', getHotels);                    // Recherche / liste hôtels
+router.get('/:id', getHotelById);              // Détail hôtel + chambres/types
+router.get('/:hotelId/rooms', getAvailableRooms); // Chambres disponibles d'un hôtel
+
+export default router;

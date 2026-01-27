@@ -9,6 +9,7 @@ export default defineConfig({
   ],
 
   server: {
-    port: 9000, // change le port 
+    port: 3001, // port temporaire pour tester
+    host: '127.0.0.1',
   },
 })

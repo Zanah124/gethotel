@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { getHotels } from "../../services/client/hotelService";
+import hotelService from "../../services/client/hotelService";
+import BookingForm from "../../components/clients/BookingForm";
+import { useAuth } from "../../context/useAuth";
+import { useNavigate } from "react-router-dom";
 import "./SearchHotels.css"; // optionnel pour styliser un peu
 
 export default function SearchHotels() {
   const [searchTerm, setSearchTerm] = useState("");
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [showBookingForm, setShowBookingForm] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const fetchHotels = React.useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getHotels(searchTerm);
+      const data = await hotelService.getHotels(searchTerm);
       setHotels(data);
     } catch (error) {
       console.error("Erreur lors du chargement des hôtels :", error);
@@ -22,6 +29,27 @@ export default function SearchHotels() {
   useEffect(() => {
     fetchHotels();
   }, [fetchHotels]);
+
+  const handleBookHotel = (hotel) => {
+    if (!user) {
+      alert('Vous devez être connecté pour réserver un hôtel');
+      navigate('/login');
+      return;
+    }
+    setSelectedHotel(hotel);
+    setShowBookingForm(true);
+  };
+
+  const handleCloseBookingForm = () => {
+    setShowBookingForm(false);
+    setSelectedHotel(null);
+  };
+
+  const handleBookingSuccess = (reservation) => {
+    alert(`Réservation confirmée ! Numéro de réservation: ${reservation.numero_reservation}`);
+    // Optionnel: rediriger vers une page de confirmation ou vers les réservations de l'utilisateur
+    // navigate('/client/reservations');
+  };
 
   return (
     <div className="search-hotels-page">
@@ -47,20 +75,38 @@ export default function SearchHotels() {
             hotels.map((hotel) => (
               <div key={hotel.id} className="hotel-card">
                 <img
-                  src={hotel.photo_principale || "/assets/images/hotel-placeholder.jpg"}
-                  alt={hotel.nom}
-                />
+  src={hotel.photo_principale 
+    ? `http://localhost:3000/uploads/${hotel.photo_principale}`
+    : "/assets/images/hotel-placeholder.jpg"
+  }
+  alt={hotel.nom}
+  className="hotel-image"
+/>
                 <div className="hotel-info">
                   <h2>{hotel.nom}</h2>
                   <p>{hotel.ville}, {hotel.pays}</p>
                   <p>{hotel.description?.substring(0, 100)}...</p>
                   <p>⭐ {hotel.nombre_etoiles || "Non classé"}</p>
-                  <button className="btn-reserver">Réserver</button>
+                  <button
+                    className="btn-reserver"
+                    onClick={() => handleBookHotel(hotel)}
+                  >
+                    Réserver
+                  </button>
                 </div>
               </div>
             ))
           )}
         </div>
+      )}
+
+      {/* Modal de réservation */}
+      {showBookingForm && selectedHotel && (
+        <BookingForm
+          hotel={selectedHotel}
+          onClose={handleCloseBookingForm}
+          onSuccess={handleBookingSuccess}
+        />
       )}
     </div>
   );

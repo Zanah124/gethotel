@@ -1,4 +1,3 @@
-// backend/src/controllers/admin/stockController.js
 import Stock from '../../../models/Stock.js';
 import MouvementStock from '../../../models/MouvementStock.js';
 import CategorieStock from '../../../models/CategorieStock.js';

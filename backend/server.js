@@ -21,7 +21,8 @@ import superadminRoutes from './src/routes/superadmin/index.js';
 import employeeStock from './src/routes/employee/stock/index.js';
 import chambreRoute from './src/routes/admin/chambreRoute.js';
 import typeChambreRoute from './src/routes/admin/typeChambreRoute.js';
-// Ajoute tes autres routes ici plus tard
+import hotelRoutes from './src/routes/client/hotelRoutes.js';
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,7 +33,7 @@ console.log('🚀 ================================');
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:9000', // Autorise uniquement ton frontend en dev
+  origin: 'http://localhost:3001', // Autorise uniquement ton frontend en dev
   credentials: true // si tu veux envoyer des cookies plus tard
 }));
 app.use(express.json());
@@ -58,6 +59,7 @@ app.use('/api/superadmin', superadminRoutes);
 app.use('/api/employee/stock', employeeStock);
 app.use('/api/admin/chambres', chambreRoute);
 app.use('/api/admin/types-chambre', typeChambreRoute);
+app.use('/api/client/hotels', hotelRoutes);
 console.log('✅ Routes /api/superadmin montées');
 
 // Middleware 404 - APRÈS toutes les routes

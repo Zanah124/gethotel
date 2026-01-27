@@ -1,4 +1,3 @@
-// backend/src/controllers/admin/typeChambreController.js
 import TypeChambre from '../../models/TypeChambre.js';
 
 // Ajouter un type de chambre
@@ -120,6 +119,32 @@ export const deleteTypeChambre = async (req, res) => {
         message: 'Impossible de supprimer : des chambres utilisent ce type'
       });
     }
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+};
+
+// uploadPhotosTypeChambre
+export const uploadPhotosTypeChambre = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const hotel_id = req.user.hotel_id;
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'Aucun fichier fourni' });
+    }
+
+    const type = await TypeChambre.findOne({ where: { id, hotel_id } });
+    if (!type) return res.status(404).json({ message: 'Type non trouvé' });
+
+    const newPhotos = req.files.map(file => `/uploads/types_chambre/${file.filename}`);
+
+    // Ajouter aux photos existantes ou remplacer
+    type.photos = [...(type.photos || []), ...newPhotos];
+    await type.save();
+
+    res.json({ message: 'Photos ajoutées', photos: type.photos });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };

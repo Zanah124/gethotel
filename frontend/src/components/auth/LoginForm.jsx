@@ -1,25 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/useAuth'; 
-
+import { useAuth } from '../../context/useAuth';
+import { ArrowLeft } from 'lucide-react'; // Optionnel : belle icône (installe lucide-react si tu veux)
 
 export default function LoginForm() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
-  const { login } = useAuth(); 
-  
+  const { login } = useAuth();
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -28,29 +21,25 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      // On utilise la fonction login du AuthContext → elle fait tout (token + user + headers)
       await login(formData.email, formData.password);
       const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-      // Petit message de bienvenue
       alert(`Connexion réussie ! Bienvenue ${user?.prenom || ''} `);
 
-      // Redirection selon le rôle (user est déjà à jour grâce au contexte)
       if (user.role === 'super_admin' || user.role === 'superadmin') {
         navigate('/super/dashboard');
       } else if (user.role === 'admin' || user.role === 'admin_hotel') {
         navigate('/admin/dashboard');
-      } else if (user.role === 'employee' || user.role === 'employee') {
+      } else if (user.role === 'employee') {
         navigate('/employee/dashboard');
       } else if (user.role === 'client') {
-        navigate('/client/dashboard');
+        navigate('/client/home');
       } else {
         navigate('/');
       }
     } catch (err) {
       const message = err.response?.data?.message || 'Identifiants incorrects ou serveur indisponible.';
       setError(message);
-      console.error('Erreur login :', err);
     } finally {
       setLoading(false);
     }
@@ -94,9 +83,9 @@ export default function LoginForm() {
       </div>
 
       <div className="text-right mb-6">
-      <Link to="/forgot-password" className="text-indigo-600 text-sm hover:underline">
-           Mot de passe oublié ?
-      </Link>
+        <Link to="/forgot-password" className="text-indigo-600 text-sm hover:underline">
+          Mot de passe oublié ?
+        </Link>
       </div>
 
       <button
@@ -117,6 +106,20 @@ export default function LoginForm() {
           S’inscrire
         </Link>
       </p>
+
+      {/* Bouton Retour vers l'accueil */}
+      <div className="mt-6 text-center">
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-indigo-600 font-medium transition"
+        >
+          {/* Option 1 : avec icône Lucide (recommandé) */}
+          {/* <ArrowLeft className="w-5 h-5" /> */}
+          {/* Option 2 : sans icône (si tu n'as pas lucide-react) */}
+          ← Retour à l'accueil
+        </button>
+      </div>
     </form>
   );
 }

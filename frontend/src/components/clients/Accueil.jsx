@@ -29,7 +29,7 @@ const Accueil = () => {
           <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mt-12">
             {/* Pour les clients */}
             <a
-              href="/rechercher"
+              href="/search"
               className="group flex items-center gap-3 bg-[#49B9FF] hover:bg-[#3aa8ee] text-black font-semibold px-8 py-4 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg"
             >
               <Search className="w-6 h-6" />

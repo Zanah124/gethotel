@@ -1,9 +1,6 @@
 import { DataTypes, Model } from 'sequelize';  
 import sequelize from '../config/database.js';
-import Hotel from './Hotel.js';
-import TypeChambre from './TypeChambre.js';
 
-// Étends Model pour avoir accès à .init(), .belongsTo(), etc.
 class Chambre extends Model {}
 
 Chambre.init(
@@ -18,7 +15,7 @@ Chambre.init(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: Hotel,
+        model: 'hotels',  
         key: 'id',
       },
       onDelete: 'CASCADE',
@@ -27,7 +24,7 @@ Chambre.init(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: TypeChambre,
+        model: 'type_chambres',  
         key: 'id',
       },
       onDelete: 'SET NULL',

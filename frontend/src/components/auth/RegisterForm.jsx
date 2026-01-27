@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; 
+import api from '../../services/api'; // Utilisation de ton instance api centralisée !
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -9,7 +9,7 @@ export default function RegisterForm() {
     email: '',
     password: '',
     telephone: '',
-    role: 'client' 
+    role: 'client'
   });
 
   const [loading, setLoading] = useState(false);
@@ -19,10 +19,7 @@ export default function RegisterForm() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -30,7 +27,6 @@ export default function RegisterForm() {
     setError('');
     setLoading(true);
 
-    // Validation simple côté front
     if (!formData.nom || !formData.prenom || !formData.email || !formData.password) {
       setError('Tous les champs obligatoires doivent être remplis');
       setLoading(false);
@@ -38,13 +34,12 @@ export default function RegisterForm() {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/register', formData);
+      // Utilisation de api au lieu d'axios direct → plus cohérent !
+      const response = await api.post('/auth/register', formData);
 
       if (response.data.success) {
         setSuccess(true);
-        setTimeout(() => {
-          navigate('/login'); 
-        }, 2000);
+        setTimeout(() => navigate('/login'), 2000);
       }
     } catch (err) {
       const message = err.response?.data?.message || 'Erreur lors de l’inscription';
@@ -69,7 +64,7 @@ export default function RegisterForm() {
 
       {success && (
         <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-          Inscription réussie ! Redirection...
+          Inscription réussie ! Redirection vers la connexion...
         </div>
       )}
 
@@ -148,6 +143,17 @@ export default function RegisterForm() {
           Se connecter
         </Link>
       </p>
+
+      {/* Bouton Retour vers l'accueil */}
+      <div className="mt-6 text-center">
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-indigo-600 font-medium transition"
+        >
+          ← Retour à l'accueil
+        </button>
+      </div>
     </form>
   );
 }

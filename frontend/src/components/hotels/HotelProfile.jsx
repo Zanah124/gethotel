@@ -10,7 +10,7 @@ const HotelProfile = () => {
   useEffect(() => {
     const fetchHotel = async () => {
       try {
-        const res = await api.get('/admin/hotel'); // ou '/api/admin/hotel' selon ta config
+        const res = await api.get('/admin/hotel'); 
         setHotel(res.data.data);
       } catch (err) {
         console.error("Erreur chargement hôtel:", err.response?.data || err);

@@ -10,8 +10,9 @@ import NavbarAdmin from './components/layout/NavbarAdmin.jsx';
 import NavbarSuper from './components/layout/NavbarSuper.jsx';
 import NavbarEmployeeHorizontal from './components/layout/NavbarEmployeeHorizontal.jsx';
 
-// Pages public 
+// Pages public
 import Home from './pages/client/Home';
+import SearchHotels from './pages/client/SearchHotels';
 import Login from './pages/auth/Login.jsx';
 import Register from './pages/auth/Register.jsx';
 
@@ -81,6 +82,7 @@ const AppContent = () => {
         <Routes>
           {/* public */}
           <Route path="/" element={<Home />} />
+          {<Route path="/search" element={<SearchHotels />} />}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 

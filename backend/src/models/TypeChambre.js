@@ -37,6 +37,12 @@ TypeChambre.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+
+photos: {
+  type: DataTypes.JSON,       
+  allowNull: true,
+  defaultValue: [],           
+},
   },
   {
     sequelize,
