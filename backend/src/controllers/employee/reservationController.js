@@ -2,24 +2,28 @@ import Reservation from '../../models/Reservation.js';
 import Chambre from '../../models/Chambre.js';
 import Hotel from '../../models/Hotel.js';
 import User from '../../models/User.js';
-//import { sendNotification } from '../../services/notificationService.js'; // À créer ou adapter
-//import { sendEmail } from '../../services/emailService.js'; // Optionnel
+import Notification from '../../models/Notification.js';
+import { Op } from 'sequelize';
 
 // Lister les réservations de l'hôtel de l'employé (avec filtres possibles)
 export const getReservations = async (req, res) => {
   try {
-    const employee = req.user; // Injecté par middleware auth + roleCheck
+    const employee = req.user;
+    const hotelId = req.hotelId ?? employee.hotel_id;
     const { statut, page = 1, limit = 10, search } = req.query;
 
-    const where = { hotel_id: employee.hotel_id };
+    const where = { hotel_id: hotelId };
     if (statut) where.statut = statut;
-    if (search) {
-      where.$or = [
-        { numero_reservation: { $like: `%${search}%` } },
-        { '$client.nom$': { $like: `%${search}%` } },
-        { '$client.prenom$': { $like: `%${search}%` } },
+    if (search && search.trim()) {
+      where[Op.or] = [
+        { numero_reservation: { [Op.like]: `%${search.trim()}%` } },
+        { '$client.nom$': { [Op.like]: `%${search.trim()}%` } },
+        { '$client.prenom$': { [Op.like]: `%${search.trim()}%` } },
       ];
     }
+
+    const lim = Math.min(parseInt(limit) || 10, 100);
+    const pg = Math.max(1, parseInt(page) || 1);
 
     const reservations = await Reservation.findAndCountAll({
       where,
@@ -28,8 +32,8 @@ export const getReservations = async (req, res) => {
         { model: Chambre, as: 'chambre', attributes: ['id', 'numero_chambre', 'etage'] },
       ],
       order: [['date_arrivee', 'DESC']],
-      limit: parseInt(limit),
-      offset: (page - 1) * limit,
+      limit: lim,
+      offset: (pg - 1) * lim,
     });
 
     res.status(200).json({
@@ -37,9 +41,9 @@ export const getReservations = async (req, res) => {
       data: reservations.rows,
       pagination: {
         total: reservations.count,
-        page: parseInt(page),
-        pages: Math.ceil(reservations.count / limit),
-        limit: parseInt(limit),
+        page: pg,
+        pages: Math.ceil(reservations.count / lim),
+        limit: lim,
       },
     });
   } catch (error) {
@@ -53,9 +57,10 @@ export const getReservationById = async (req, res) => {
   try {
     const { id } = req.params;
     const employee = req.user;
+    const hotelId = req.hotelId ?? employee.hotel_id;
 
     const reservation = await Reservation.findOne({
-      where: { id, hotel_id: employee.hotel_id },
+      where: { id, hotel_id: hotelId },
       include: [
         { model: User, as: 'client', attributes: ['id', 'nom', 'prenom', 'email', 'telephone'] },
         { model: Chambre, as: 'chambre', attributes: ['id', 'numero_chambre', 'etage', 'statut'] },
@@ -75,14 +80,15 @@ export const getReservationById = async (req, res) => {
   }
 };
 
-// Confirmer une réservation (en_attente → confirmee)
+// Confirmer une réservation (en_attente → confirmee) + notification client avec numéro
 export const confirmReservation = async (req, res) => {
   try {
     const { id } = req.params;
     const employee = req.user;
+    const hotelId = req.hotelId ?? employee.hotel_id;
 
     const reservation = await Reservation.findOne({
-      where: { id, hotel_id: employee.hotel_id, statut: 'en_attente' },
+      where: { id, hotel_id: hotelId, statut: 'en_attente' },
       include: [{ model: Chambre, as: 'chambre' }],
     });
 
@@ -95,8 +101,18 @@ export const confirmReservation = async (req, res) => {
     reservation.is_verified = 1;
     await reservation.save();
 
-    // Notification au client (optionnel)
-    // await sendNotification(reservation.client_id, 'Votre réservation a été confirmée !');
+    const msg = reservation.numero_reservation
+      ? `Votre réservation a été confirmée par l'hôtel. Numéro : ${reservation.numero_reservation}`
+      : `Votre réservation a été confirmée par l'hôtel.`;
+
+    await Notification.create({
+      user_id: reservation.client_id,
+      message: msg,
+      type: 'reservation_confirmed',
+      reservation_id: reservation.id,
+      numero_reservation: reservation.numero_reservation || null,
+      read: false,
+    });
 
     res.status(200).json({ success: true, message: 'Réservation confirmée avec succès', data: reservation });
   } catch (error) {
@@ -110,9 +126,10 @@ export const checkIn = async (req, res) => {
   try {
     const { id } = req.params;
     const employee = req.user;
+    const hotelId = req.hotelId ?? employee.hotel_id;
 
     const reservation = await Reservation.findOne({
-      where: { id, hotel_id: employee.hotel_id, statut: 'confirmee' },
+      where: { id, hotel_id: hotelId, statut: 'confirmee' },
       include: [{ model: Chambre, as: 'chambre' }],
     });
 
@@ -142,9 +159,10 @@ export const checkOut = async (req, res) => {
   try {
     const { id } = req.params;
     const employee = req.user;
+    const hotelId = req.hotelId ?? employee.hotel_id;
 
     const reservation = await Reservation.findOne({
-      where: { id, hotel_id: employee.hotel_id, statut: 'check_in' },
+      where: { id, hotel_id: hotelId, statut: 'check_in' },
       include: [{ model: Chambre, as: 'chambre' }],
     });
 
@@ -176,11 +194,12 @@ export const cancelReservation = async (req, res) => {
     const { motif } = req.body;
     const employee = req.user;
 
+    const hotelId = req.hotelId ?? employee.hotel_id;
     const reservation = await Reservation.findOne({
       where: {
         id,
-        hotel_id: employee.hotel_id,
-        statut: { $in: ['en_attente', 'confirmee'] },
+        hotel_id: hotelId,
+        statut: { [Op.in]: ['en_attente', 'confirmee'] },
       },
       include: [{ model: Chambre, as: 'chambre' }],
     });

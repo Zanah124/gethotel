@@ -108,7 +108,7 @@ export const getHotelById = async (req, res) => {
             {
               model: TypeChambre,
               as: 'typeChambre',
-              attributes: ['id', 'nom', 'prix_par_nuit', 'capacite_adultes', 'capacite_enfants', 'description'],
+              attributes: ['id', 'nom', 'prix_par_nuit', 'capacite', 'description'],
             },
           ],
           required: false,
@@ -163,7 +163,7 @@ export const getAvailableRooms = async (req, res) => {
         {
           model: TypeChambre,
           as: 'typeChambre',
-          attributes: ['id', 'nom', 'description', 'prix_par_nuit', 'capacite_adultes', 'capacite_enfants'],
+          attributes: ['id', 'nom', 'description', 'prix_par_nuit', 'capacite'],
         },
       ],
     });
@@ -187,9 +187,8 @@ export const getAvailableRooms = async (req, res) => {
         },
       });
 
-      // Si pas de conflit + capacité suffisante
-      const capaciteTotale = (chambre.typeChambre?.capacite_adultes || 2) + 
-                       (chambre.typeChambre?.capacite_enfants || 0);
+      // Si pas de conflit + capacité suffisante (capacite = total adultes + enfants)
+      const capaciteTotale = chambre.typeChambre?.capacite ?? 2;
       const personnesTotal = parseInt(nombre_adultes) + parseInt(nombre_enfants);
 
       if (reservationsConflit === 0 && personnesTotal <= capaciteTotale) {

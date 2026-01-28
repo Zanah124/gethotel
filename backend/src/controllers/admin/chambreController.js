@@ -71,7 +71,11 @@ export const getChambreById = async (req, res) => {
 
     const chambre = await Chambre.findOne({
       where: { id, hotel_id },
-      include: [{ model: TypeChambre, as: 'typeChambre' }],
+      include: [{
+        model: TypeChambre,
+        as: 'typeChambre',
+        attributes: { exclude: ['photos'] },
+      }],
     });
 
     if (!chambre) {
@@ -175,9 +179,14 @@ export const updateChambreStatutByEmployee = async (req, res) => {
     await chambre.update({ statut });
 
     // Récupérer la chambre mise à jour avec le type
+    // Exclure 'photos' si la colonne n'existe pas encore (migration non exécutée)
     const chambreMiseAJour = await Chambre.findOne({
       where: { id },
-      include: [{ model: TypeChambre, as: 'typeChambre' }],
+      include: [{
+        model: TypeChambre,
+        as: 'typeChambre',
+        attributes: { exclude: ['photos'] },
+      }],
     });
 
     res.json({ 

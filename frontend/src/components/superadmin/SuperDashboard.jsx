@@ -49,7 +49,7 @@ const SuperDashboard = () => {
             <p className="text-gray-600 mt-2">Voir, modifier ou supprimer les hôtels</p>
           </Link>
 
-          <Link to="/super/users" className="bg-white rounded-2xl shadow-lg P-8 hover:shadow-2xl transition-all text-center group">
+          <Link to="/super/users" className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all text-center group">
             <Users className="w-16 h-16 mx-auto mb-4 text-[#49B9FF] group-hover:scale-110 transition" />
             <h3 className="text-xl font-bold">Gestion utilisateurs</h3>
             <p className="text-gray-600 mt-2">Admins hôtel, clients, etc.</p>

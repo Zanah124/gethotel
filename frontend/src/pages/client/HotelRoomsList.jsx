@@ -140,7 +140,7 @@ const HotelRoomsList = () => {
               </p>
 
               <div className="space-y-2 text-gray-700 mb-4">
-                <p>👥 {type.capacite_adultes} adultes, {type.capacite_enfants} enfants</p>
+                <p>👥 Capacité : {type.capacite ?? 2} personne(s)</p>
                 <p>
                   📊 Statut :{" "}
                   <span className={type.nombreDisponibles > 0 ? "text-green-600" : "text-red-600"}>

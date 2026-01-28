@@ -2,6 +2,82 @@ import Reservation from '../../models/Reservation.js';
 import Chambre from '../../models/Chambre.js';
 import Hotel from '../../models/Hotel.js';
 import User from '../../models/User.js';
+import TypeChambre from '../../models/TypeChambre.js';
+import { Op } from 'sequelize';
+
+// Créer une réservation (client connecté)
+export const createReservation = async (req, res) => {
+  try {
+    const client = req.user;
+    const { chambre_id, hotel_id, date_arrivee, date_depart, nombre_adultes, nombre_enfants = 0, demandes_speciales } = req.body;
+
+    if (!chambre_id || !hotel_id || !date_arrivee || !date_depart || !nombre_adultes) {
+      return res.status(400).json({
+        success: false,
+        message: 'chambre_id, hotel_id, date_arrivee, date_depart et nombre_adultes sont requis',
+      });
+    }
+
+    const chambre = await Chambre.findOne({
+      where: { id: chambre_id, hotel_id },
+      include: [{ model: TypeChambre, as: 'typeChambre', attributes: ['id', 'nom', 'prix_par_nuit', 'capacite'] }],
+    });
+
+    if (!chambre || !chambre.typeChambre) {
+      return res.status(404).json({ success: false, message: 'Chambre ou type non trouvé pour cet hôtel' });
+    }
+
+    const startDate = new Date(date_arrivee);
+    const endDate = new Date(date_depart);
+    const nights = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
+    const prixParNuit = parseFloat(chambre.typeChambre.prix_par_nuit);
+    const prix_total = Math.round(nights * prixParNuit * 100) / 100;
+
+    const conflit = await Reservation.count({
+      where: {
+        chambre_id,
+        [Op.or]: [
+          { date_arrivee: { [Op.lte]: endDate }, date_depart: { [Op.gte]: startDate } },
+        ],
+        statut: { [Op.notIn]: ['annulee', 'terminee'] },
+      },
+    });
+    if (conflit > 0) {
+      return res.status(409).json({
+        success: false,
+        message: 'Cette chambre n\'est plus disponible pour les dates choisies',
+      });
+    }
+
+    const numero_reservation = `RES-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+
+    const reservation = await Reservation.create({
+      numero_reservation,
+      client_id: client.id,
+      chambre_id,
+      hotel_id,
+      date_arrivee,
+      date_depart,
+      nombre_adultes: parseInt(nombre_adultes),
+      nombre_enfants: parseInt(nombre_enfants) || 0,
+      prix_total,
+      demandes_speciales: demandes_speciales || null,
+      created_by: client.id,
+    });
+
+    const created = await Reservation.findByPk(reservation.id, {
+      include: [
+        { model: Chambre, as: 'chambre', attributes: ['id', 'numero_chambre', 'etage'] },
+        { model: Hotel, as: 'hotel', attributes: ['id', 'nom', 'ville'] },
+      ],
+    });
+
+    res.status(201).json({ success: true, data: created, message: 'Réservation créée avec succès' });
+  } catch (err) {
+    console.error('Erreur createReservation:', err);
+    res.status(500).json({ success: false, message: 'Erreur serveur lors de la création de la réservation' });
+  }
+};
 
 // Lister les réservations du client connecté
 export const getMyReservations = async (req, res) => {
@@ -96,7 +172,7 @@ export const cancelMyReservation = async (req, res) => {
       where: {
         id,
         client_id: client.id,
-        statut: ['en_attente', 'confirmee'], // Seulement ces statuts peuvent être annulés par le client
+        statut: { [Op.in]: ['en_attente', 'confirmee'] },
       },
       include: [{ model: Chambre, as: 'chambre' }],
     });

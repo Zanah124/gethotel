@@ -16,8 +16,13 @@ import SearchHotels from './pages/client/SearchHotels';
 import Login from './pages/auth/Login.jsx';
 import Register from './pages/auth/Register.jsx';
 
+// Pages client
+import ClientDashboard from './pages/client/ClientDashboard.jsx';
+import MyReservations from './pages/client/MyReservations.jsx';
+
 //Pages employee
 import Stock from './pages/employee/stock.jsx';
+import EmployeeReservations from './pages/employee/EmployeeReservations.jsx';
 import AddProduitModal from './components/stock/AddProduitModal.jsx';
 import MouvementModal from './components/stock/MouvementModal.jsx';
 import CategorieModal from './components/stock/CategorieModal.jsx';
@@ -42,6 +47,7 @@ import { SuperAdminRoute } from './components/superadmin/ProtectedRoute.jsx';
 import MenuSuper from './pages/superadmin/MenuSuper.jsx';
 import HotelsG from './pages/superadmin/HotelsG.jsx';
 import CreateHotel from './components/superadmin/CreateHotel.jsx';
+import UsersSuper from './pages/superadmin/UsersSuper.jsx';
 
 
 const AppContent = () => {
@@ -86,8 +92,13 @@ const AppContent = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
+          {/* Client */}
+          <Route path="/client/dashboard" element={<ClientDashboard />} />
+          <Route path="/client/my-reservations" element={<MyReservations />} />
+
           {/* Employee hôtel */}
           <Route path="/employee/stock" element={<Stock />} />
+          <Route path="/employee/reservations" element={<EmployeeReservations />} />
           <Route path="/employee/stock/create" element={<AddProduitModal />} />
           <Route path="/employee/stock/mouvements" element={<MouvementModal />} />
           <Route path="/employee/stock/categories" element={<CategorieModal />} />
@@ -117,6 +128,7 @@ const AppContent = () => {
                     <Route path="dashboard" element={<MenuSuper />} />
                     <Route path="hotels" element={<HotelsG />} />
                     <Route path="hotels/create" element={<CreateHotel />} />
+                    <Route path="users" element={<UsersSuper />} />
                 </Routes>
                 </div>
               </SuperAdminRoute>

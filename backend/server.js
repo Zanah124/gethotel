@@ -22,6 +22,9 @@ import employeeStock from './src/routes/employee/stock/index.js';
 import chambreRoute from './src/routes/admin/chambreRoute.js';
 import typeChambreRoute from './src/routes/admin/typeChambreRoute.js';
 import hotelRoutes from './src/routes/client/hotelRoutes.js';
+import reservationRoutes from './src/routes/client/reservationRoutes.js';
+import notificationRoutes from './src/routes/client/notificationRoutes.js';
+import employeeReservationRoutes from './src/routes/employee/reservationRoutes.js';
 
 
 const app = express();
@@ -60,7 +63,10 @@ app.use('/api/employee/stock', employeeStock);
 app.use('/api/admin/chambres', chambreRoute);
 app.use('/api/admin/types-chambre', typeChambreRoute);
 app.use('/api/client/hotels', hotelRoutes);
-console.log('✅ Routes /api/superadmin montées');
+app.use('/api/client/reservations', reservationRoutes);
+app.use('/api/client/notifications', notificationRoutes);
+app.use('/api/employee/reservations', employeeReservationRoutes);
+console.log('✅ Routes client (hotels, réservations, notifications) et employee/reservations montées');
 
 // Middleware 404 - APRÈS toutes les routes
 app.use((req, res) => {

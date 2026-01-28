@@ -71,12 +71,15 @@ export default function BookingForm({ hotel, onClose, onSuccess }) {
   const calculateTotalPrice = () => {
     if (!selectedRoom || !formData.date_arrivee || !formData.date_depart) return;
 
+    const type = selectedRoom.typeChambre ?? selectedRoom.type_chambre;
+    if (!type?.prix_par_nuit) return;
+
     const startDate = new Date(formData.date_arrivee);
     const endDate = new Date(formData.date_depart);
     const nights = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
 
     if (nights > 0) {
-      setTotalPrice(nights * selectedRoom.type_chambre.prix_par_nuit);
+      setTotalPrice(nights * type.prix_par_nuit);
     }
   };
 
@@ -290,7 +293,10 @@ export default function BookingForm({ hotel, onClose, onSuccess }) {
                 </div>
               ) : (
                 <div className="grid gap-4 max-h-96 overflow-y-auto">
-                  {availableRooms.map((room) => (
+                  {availableRooms.map((room) => {
+                    const type = room.typeChambre ?? room.type_chambre;
+                    if (!type) return null;
+                    return (
                     <div
                       key={room.id}
                       className={`border rounded-lg p-4 cursor-pointer transition-all ${
@@ -313,35 +319,36 @@ export default function BookingForm({ hotel, onClose, onSuccess }) {
 
                           <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
                             <div>
-                              <span className="font-medium">Type:</span> {room.type_chambre.nom}
+                              <span className="font-medium">Type:</span> {type.nom}
                             </div>
                             <div>
                               <span className="font-medium">Étage:</span> {room.etage || 'RDC'}
                             </div>
                             <div>
-                              <span className="font-medium">Capacité:</span> {room.type_chambre.capacite} personnes
+                              <span className="font-medium">Capacité:</span> {type.capacite} personnes
                             </div>
                             <div>
-                              <span className="font-medium">Prix/nuit:</span> {room.type_chambre.prix_par_nuit}€
+                              <span className="font-medium">Prix/nuit:</span> {type.prix_par_nuit} Ar
                             </div>
                           </div>
 
-                          {room.type_chambre.description && (
+                          {type.description && (
                             <p className="text-sm text-gray-500 mt-2">
-                              {room.type_chambre.description}
+                              {type.description}
                             </p>
                           )}
                         </div>
 
                         <div className="text-right">
                           <div className="text-2xl font-bold text-indigo-600">
-                            {room.type_chambre.prix_par_nuit}€
+                            {type.prix_par_nuit} Ar
                           </div>
                           <div className="text-sm text-gray-500">par nuit</div>
                         </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -362,24 +369,27 @@ export default function BookingForm({ hotel, onClose, onSuccess }) {
             </div>
 
             {/* Résumé et prix */}
-            {selectedRoom && formData.date_arrivee && formData.date_depart && (
+            {selectedRoom && formData.date_arrivee && formData.date_depart && (() => {
+              const type = selectedRoom.typeChambre ?? selectedRoom.type_chambre;
+              return (
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-semibold text-gray-800 mb-2">Résumé de la réservation</h3>
                 <div className="space-y-1 text-sm text-gray-600">
                   <p><span className="font-medium">Hôtel:</span> {hotel?.nom}</p>
-                  <p><span className="font-medium">Chambre:</span> {selectedRoom.numero_chambre} - {selectedRoom.type_chambre.nom}</p>
-                  <p><span className="font-medium">Prix par nuit:</span> {selectedRoom.type_chambre.prix_par_nuit}€</p>
+                  <p><span className="font-medium">Chambre:</span> {selectedRoom.numero_chambre} - {type?.nom ?? '—'}</p>
+                  <p><span className="font-medium">Prix par nuit:</span> {type?.prix_par_nuit ?? '—'} Ar</p>
                   <p><span className="font-medium">Nombre de nuits:</span> {
                     formData.date_arrivee && formData.date_depart
                       ? Math.ceil((new Date(formData.date_depart) - new Date(formData.date_arrivee)) / (1000 * 60 * 60 * 24))
                       : 0
                   }</p>
                   <p className="font-semibold text-lg text-gray-800 pt-2 border-t">
-                    Total: {totalPrice}€
+                    Total: {totalPrice} Ar
                   </p>
                 </div>
               </div>
-            )}
+            );
+            })()}
 
             {/* Boutons */}
             <div className="flex gap-4 pt-4">
