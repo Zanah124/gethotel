@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le :  lun. 26 jan. 2026 à 08:17
+-- Généré le :  lun. 09 fév. 2026 à 13:40
 -- Version du serveur :  5.7.17
 -- Version de PHP :  5.6.30
 
@@ -21,6 +21,8 @@ SET time_zone = "+00:00";
 --
 -- Base de données :  `hotel_management`
 --
+CREATE DATABASE IF NOT EXISTS `hotel_management` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `hotel_management`;
 
 -- --------------------------------------------------------
 
@@ -40,7 +42,8 @@ CREATE TABLE `categories_stock` (
 --
 
 INSERT INTO `categories_stock` (`id`, `nom`, `description`, `created_at`) VALUES
-(1, 'Produit ménager', 'pour le ménage', '2026-01-23 11:38:27');
+(1, 'Produit ménager', 'pour le ménage', '2026-01-23 11:38:27'),
+(2, 'Produits d\'entretien', 'Produits pour le nettoyage', '2026-01-28 18:13:52');
 
 -- --------------------------------------------------------
 
@@ -65,7 +68,8 @@ CREATE TABLE `chambres` (
 --
 
 INSERT INTO `chambres` (`id`, `hotel_id`, `type_chambre_id`, `numero_chambre`, `etage`, `statut`, `notes`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, '102', 1, 'disponible', 'Vue sur jardin', '2026-01-23 13:35:05', '2026-01-23 13:35:22');
+(1, 1, 1, '102', 1, 'nettoyage', 'Vue sur jardin', '2026-01-23 13:35:05', '2026-02-03 11:33:20'),
+(2, 1, 2, '105', 1, 'disponible', 'Vue sur ville', '2026-01-26 07:29:18', '2026-01-26 07:29:18');
 
 -- --------------------------------------------------------
 
@@ -136,7 +140,7 @@ CREATE TABLE `employees` (
 INSERT INTO `employees` (`id`, `user_id`, `hotel_id`, `poste`, `departement`, `salaire_mensuel`, `date_embauche`, `contrat_type`, `statut`, `created_at`, `updated_at`) VALUES
 (3, 8, 1, 'Réceptionniste', 'Accueil', '10000.00', '2025-10-02 03:00:00', 'CDI', 'actif', '2025-12-08 22:50:37', '2025-12-08 22:50:37'),
 (5, 12, 1, 'Agent de sécurité', 'Sécurité', '130000.00', '2025-09-01 03:00:00', 'interim', 'actif', '2025-12-09 14:07:55', '2025-12-09 14:07:55'),
-(6, 14, 1, 'Réceptionniste', 'Hébergement', '200000.00', '2026-01-23 03:00:00', 'interim', 'actif', '2026-01-23 11:35:37', '2026-01-23 11:35:37');
+(6, 14, 1, 'Réceptionniste', 'Accueil', '200000.00', '2026-01-23 03:00:00', 'interim', 'actif', '2026-01-23 11:35:37', '2026-02-03 14:51:35');
 
 -- --------------------------------------------------------
 
@@ -191,6 +195,38 @@ CREATE TABLE `mouvements_stock` (
   `date_mouvement` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Déchargement des données de la table `mouvements_stock`
+--
+
+INSERT INTO `mouvements_stock` (`id`, `stock_id`, `type_mouvement`, `quantite`, `motif`, `effectue_par`, `date_mouvement`) VALUES
+(1, 1, 'entree', 100, 'Réception de commande via Damar', 14, '2026-01-28 15:25:45'),
+(2, 1, 'sortie', 10, 'Utilisation chambre', 14, '2026-02-03 14:34:30');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `message` varchar(500) NOT NULL,
+  `type` varchar(50) DEFAULT 'info',
+  `reservation_id` int(11) DEFAULT NULL,
+  `numero_reservation` varchar(50) DEFAULT NULL,
+  `read` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Déchargement des données de la table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `user_id`, `message`, `type`, `reservation_id`, `numero_reservation`, `read`, `created_at`) VALUES
+(1, 13, 'Votre réservation a été confirmée par l\'hôtel. Numéro : RES-1769607137850-XOXSRP', 'reservation_confirmed', 1, 'RES-1769607137850-XOXSRP', 1, '2026-01-28 17:01:42');
+
 -- --------------------------------------------------------
 
 --
@@ -235,6 +271,15 @@ CREATE TABLE `reservations` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Déchargement des données de la table `reservations`
+--
+
+INSERT INTO `reservations` (`id`, `numero_reservation`, `client_id`, `chambre_id`, `hotel_id`, `date_arrivee`, `date_depart`, `nombre_adultes`, `nombre_enfants`, `prix_total`, `statut`, `demandes_speciales`, `created_by`, `verified_by`, `is_verified`, `created_at`, `updated_at`) VALUES
+(1, 'RES-1769607137850-XOXSRP', 13, 1, 1, '2026-01-30', '2026-02-14', 2, 0, '1200000.00', 'confirmee', NULL, 13, 14, 1, '2026-01-28 13:32:17', '2026-01-28 14:01:42'),
+(2, 'RES-1770040723978-JT241A', 13, 2, 1, '2026-03-05', '2026-04-11', 2, 2, '3774000.00', 'en_attente', NULL, 13, NULL, 0, '2026-02-02 13:58:43', '2026-02-02 13:58:43'),
+(3, 'RES-1770118671297-USSO22', 13, 1, 1, '2026-02-20', '2026-02-28', 1, 0, '640000.00', 'en_attente', NULL, 13, NULL, 0, '2026-02-03 11:37:51', '2026-02-03 11:37:51');
+
 -- --------------------------------------------------------
 
 --
@@ -262,27 +307,7 @@ CREATE TABLE `stock` (
 --
 
 INSERT INTO `stock` (`id`, `hotel_id`, `categorie_id`, `nom_article`, `description`, `quantite_actuelle`, `quantite_minimale`, `unite_mesure`, `prix_unitaire`, `fournisseur`, `derniere_commande`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 'Savon extra', 'Moyens', 8, 10, 'pièce', '2000.00', 'Damar', NULL, '2026-01-23 11:42:35', '2026-01-23 11:42:35');
-
--- --------------------------------------------------------
-
---
--- Structure de la table `subscriptions`
---
-
-CREATE TABLE `subscriptions` (
-  `id` int(11) NOT NULL,
-  `hotel_id` int(11) NOT NULL,
-  `plan_id` int(11) NOT NULL,
-  `stripe_subscription_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('active','canceled','past_due','trialing','incomplete','incomplete_expired') COLLATE utf8mb4_unicode_ci DEFAULT 'trialing',
-  `current_period_start` datetime DEFAULT NULL,
-  `current_period_end` datetime DEFAULT NULL,
-  `trial_end` datetime DEFAULT NULL,
-  `canceled_at` datetime DEFAULT NULL,
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+(1, 1, 1, 'Savon extra', 'Moyens', 98, 10, 'pièce', '2000.00', 'Damar', NULL, '2026-01-23 11:42:35', '2026-02-03 14:34:31');
 
 -- --------------------------------------------------------
 
@@ -307,6 +332,26 @@ CREATE TABLE `subscription_plans` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `subscriptions`
+--
+
+CREATE TABLE `subscriptions` (
+  `id` int(11) NOT NULL,
+  `hotel_id` int(11) NOT NULL,
+  `plan_id` int(11) NOT NULL,
+  `stripe_subscription_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('active','canceled','past_due','trialing','incomplete','incomplete_expired') COLLATE utf8mb4_unicode_ci DEFAULT 'trialing',
+  `current_period_start` datetime DEFAULT NULL,
+  `current_period_end` datetime DEFAULT NULL,
+  `trial_end` datetime DEFAULT NULL,
+  `canceled_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `type_chambres`
 --
 
@@ -318,15 +363,17 @@ CREATE TABLE `type_chambres` (
   `prix_par_nuit` decimal(10,2) NOT NULL,
   `capacite` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `photos` json DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `type_chambres`
 --
 
-INSERT INTO `type_chambres` (`id`, `hotel_id`, `nom`, `description`, `prix_par_nuit`, `capacite`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Double premium', 'Luxe et confort', '80000.00', 2, '2026-01-23 13:34:09', '2026-01-23 13:34:09');
+INSERT INTO `type_chambres` (`id`, `hotel_id`, `nom`, `description`, `prix_par_nuit`, `capacite`, `created_at`, `updated_at`, `photos`) VALUES
+(1, 1, 'Double premium', 'Luxe et confort', '80000.00', 2, '2026-01-23 13:34:09', '2026-01-23 13:34:09', NULL),
+(2, 1, 'Familiale', 'Deux lits de grande espace', '102000.00', 5, '2026-01-26 07:27:44', '2026-01-26 07:27:44', NULL);
 
 -- --------------------------------------------------------
 
@@ -422,6 +469,14 @@ ALTER TABLE `mouvements_stock`
   ADD KEY `effectue_par` (`effectue_par`);
 
 --
+-- Index pour la table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_read` (`user_id`,`read`),
+  ADD KEY `idx_created` (`created_at`);
+
+--
 -- Index pour la table `planning_employees`
 --
 ALTER TABLE `planning_employees`
@@ -449,6 +504,14 @@ ALTER TABLE `stock`
   ADD KEY `categorie_id` (`categorie_id`);
 
 --
+-- Index pour la table `subscription_plans`
+--
+ALTER TABLE `subscription_plans`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD UNIQUE KEY `name_2` (`name`);
+
+--
 -- Index pour la table `subscriptions`
 --
 ALTER TABLE `subscriptions`
@@ -457,14 +520,6 @@ ALTER TABLE `subscriptions`
   ADD UNIQUE KEY `stripe_subscription_id_2` (`stripe_subscription_id`),
   ADD KEY `hotel_id` (`hotel_id`),
   ADD KEY `plan_id` (`plan_id`);
-
---
--- Index pour la table `subscription_plans`
---
-ALTER TABLE `subscription_plans`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD UNIQUE KEY `name_2` (`name`);
 
 --
 -- Index pour la table `type_chambres`
@@ -490,12 +545,12 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `categories_stock`
 --
 ALTER TABLE `categories_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pour la table `chambres`
 --
 ALTER TABLE `chambres`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pour la table `clients`
 --
@@ -520,7 +575,12 @@ ALTER TABLE `hotels`
 -- AUTO_INCREMENT pour la table `mouvements_stock`
 --
 ALTER TABLE `mouvements_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT pour la table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT pour la table `planning_employees`
 --
@@ -530,27 +590,27 @@ ALTER TABLE `planning_employees`
 -- AUTO_INCREMENT pour la table `reservations`
 --
 ALTER TABLE `reservations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT pour la table `stock`
 --
 ALTER TABLE `stock`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
--- AUTO_INCREMENT pour la table `subscriptions`
---
-ALTER TABLE `subscriptions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
 -- AUTO_INCREMENT pour la table `subscription_plans`
 --
 ALTER TABLE `subscription_plans`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- AUTO_INCREMENT pour la table `subscriptions`
+--
+ALTER TABLE `subscriptions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- AUTO_INCREMENT pour la table `type_chambres`
 --
 ALTER TABLE `type_chambres`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pour la table `users`
 --
