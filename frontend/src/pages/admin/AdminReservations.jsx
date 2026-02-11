@@ -1,28 +1,35 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import employeeReservationService from '../../services/employee/reservationService';
-import { LogIn, LogOut, Calendar } from 'lucide-react';
 
-/**
- * Vue Réservations employé.
- * Peut être utilisée en mode "toutes" ou en vue ciblée Check-in / Check-out via props.
- * @param {string} [initialStatut] - Filtre initial : 'confirmee' pour Check-in, 'check_in' pour Check-out
- * @param {string} [pageTitle] - Titre de la page (ex: "Check-in", "Check-out")
- * @param {boolean} [lockFilter] - Si true, le filtre statut est fixé à initialStatut (vue dédiée)
- */
-export default function EmployeeReservations({ initialStatut = '', pageTitle, lockFilter = false }) {
+export default function AdminReservations() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [statut, setStatut] = useState(initialStatut);
+  const [statut, setStatut] = useState('');
   const [actionLoading, setActionLoading] = useState(null);
 
-  // ⭐ IMPORTANT: Définir fetchReservations AVANT les useEffect qui l'utilisent
-  const fetchReservations = useCallback(async () => {
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    // Accès réservé aux admins d'hôtel
+    if (!['admin', 'admin_hotel'].includes(user.role)) {
+      navigate('/');
+      return;
+    }
+
+    fetchReservations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, navigate, statut]);
+
+  const fetchReservations = async () => {
     try {
       setLoading(true);
       const params = { limit: 50 };
@@ -38,26 +45,7 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
     } finally {
       setLoading(false);
     }
-  }, [statut, search]);
-
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    if (user.role !== 'employee') {
-      navigate('/');
-      return;
-    }
-    fetchReservations();
-  }, [user, navigate]);
-
-  // Garder le filtre synchronisé si initialStatut change (ex: navigation entre Check-in et Check-out)
-  useEffect(() => {
-    if (initialStatut !== undefined && initialStatut !== null) {
-      setStatut(initialStatut);
-    }
-  }, [initialStatut]);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -84,18 +72,11 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
     if (!window.confirm('Effectuer le check-in ?')) return;
     setActionLoading(id);
     try {
-      const res = await employeeReservationService.checkIn(id);
-      // Option 1 : mise à jour locale
-      setReservations(prev =>
-        prev.map(r =>
-          r.id === id
-            ? { ...r, statut: 'check_in', date_check_in: res.data?.date_check_in || new Date().toISOString() }
-            : r
-        )
+      await employeeReservationService.checkIn(id);
+      setReservations((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, statut: 'check_in' } : r))
       );
-      // Option 2 : recharger après 800ms (plus fiable si plusieurs personnes modifient)
-      setTimeout(fetchReservations, 800);
-      alert('Check-in effectué avec succès');
+      alert('Check-in effectué.');
     } catch (err) {
       alert(err.response?.data?.message || 'Erreur lors du check-in');
     } finally {
@@ -104,20 +85,14 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
   };
 
   const handleCheckOut = async (id) => {
-    if (!window.confirm('Effectuer le check-out ? La chambre passera en nettoyage.')) return;
+    if (!window.confirm('Effectuer le check-out ?')) return;
     setActionLoading(id);
     try {
-      const res = await employeeReservationService.checkOut(id);
-      const updated = res?.data;
+      await employeeReservationService.checkOut(id);
       setReservations((prev) =>
-        prev.map((r) =>
-          r.id === id
-            ? { ...r, statut: 'terminee', date_check_out: updated?.date_check_out || new Date().toISOString() }
-            : r
-        )
+        prev.map((r) => (r.id === id ? { ...r, statut: 'terminee' } : r))
       );
-      setTimeout(fetchReservations, 800);
-      alert('Check-out effectué. Chambre en nettoyage.');
+      alert('Check-out effectué.');
     } catch (err) {
       alert(err.response?.data?.message || 'Erreur lors du check-out');
     } finally {
@@ -170,17 +145,6 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
     });
   };
 
-  const formatDateTime = (d) => {
-    if (!d) return '—';
-    return new Date(d).toLocaleString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   const clientName = (r) => {
     const c = r.client;
     if (!c) return '—';
@@ -189,28 +153,12 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
 
   if (!user) return null;
 
-  const title = pageTitle || 'Réservations';
-  const isCheckInView = lockFilter && statut === 'confirmee';
-  const isCheckOutView = lockFilter && statut === 'check_in';
-
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-3 mb-6">
-          {isCheckInView && <LogIn className="w-8 h-8 text-[#081F5C]" />}
-          {isCheckOutView && <LogOut className="w-8 h-8 text-[#861D1D]" />}
-          {!isCheckInView && !isCheckOutView && <Calendar className="w-8 h-8 text-[#081F5C]" />}
-          <h1 className="text-2xl font-bold text-gray-900">
-            {title}
-          </h1>
-        </div>
-        {(isCheckInView || isCheckOutView) && (
-          <p className="text-gray-600 mb-6">
-            {isCheckInView
-              ? 'Réservations confirmées prêtes pour l\'arrivée du client. Cliquez sur « Check-in » lorsque le client arrive.'
-              : 'Clients actuellement en chambre. Cliquez sur « Check-out » au départ.'}
-          </p>
-        )}
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">
+          Gestion des réservations
+        </h1>
 
         <div className="bg-white rounded-lg shadow p-4 mb-6 flex flex-wrap gap-4 items-end">
           <form onSubmit={handleSearch} className="flex flex-wrap gap-2 flex-1 min-w-[200px]">
@@ -228,20 +176,18 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
               Rechercher
             </button>
           </form>
-          {!lockFilter && (
-            <select
-              value={statut}
-              onChange={(e) => setStatut(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#081F5C]"
-            >
-              <option value="">Tous les statuts</option>
-              <option value="en_attente">En attente</option>
-              <option value="confirmee">Confirmée</option>
-              <option value="check_in">Check-in</option>
-              <option value="terminee">Terminée</option>
-              <option value="annulee">Annulée</option>
-            </select>
-          )}
+          <select
+            value={statut}
+            onChange={(e) => setStatut(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#081F5C]"
+          >
+            <option value="">Tous les statuts</option>
+            <option value="en_attente">En attente</option>
+            <option value="confirmee">Confirmée</option>
+            <option value="check_in">Check-in</option>
+            <option value="terminee">Terminée</option>
+            <option value="annulee">Annulée</option>
+          </select>
         </div>
 
         {error && (
@@ -254,9 +200,7 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
           <div className="text-center py-12 text-gray-500">Chargement…</div>
         ) : reservations.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-            {isCheckInView && 'Aucune réservation prête pour check-in.'}
-            {isCheckOutView && 'Aucun client actuellement en chambre (check-out).'}
-            {!isCheckInView && !isCheckOutView && 'Aucune réservation.'}
+            Aucune réservation.
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -267,9 +211,8 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Numéro</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chambre</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Séjour</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dates</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Check-in / Check-out</th>
                     <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
@@ -299,23 +242,6 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
                           >
                             {statutLabel(r.statut)}
                           </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
-                          <div className="space-y-0.5">
-                            {r.date_check_in && (
-                              <div title="Heure de check-in">
-                                <span className="text-green-700 font-medium">Entrée : </span>
-                                {formatDateTime(r.date_check_in)}
-                              </div>
-                            )}
-                            {r.date_check_out && (
-                              <div title="Heure de check-out">
-                                <span className="text-gray-700 font-medium">Sortie : </span>
-                                {formatDateTime(r.date_check_out)}
-                              </div>
-                            )}
-                            {!r.date_check_in && !r.date_check_out && '—'}
-                          </div>
                         </td>
                         <td className="px-4 py-3 text-right space-x-2">
                           {r.statut === 'en_attente' && (
@@ -367,3 +293,4 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
     </div>
   );
 }
+

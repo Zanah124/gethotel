@@ -1,4 +1,3 @@
-// src/screens/employee/StockScreen.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AddProduitModal from './AddProduitModal';

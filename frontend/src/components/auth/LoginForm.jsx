@@ -31,7 +31,7 @@ export default function LoginForm() {
       } else if (user.role === 'admin' || user.role === 'admin_hotel') {
         navigate('/admin/dashboard');
       } else if (user.role === 'employee') {
-        navigate('/employee/dashboard');
+        navigate('/employee/reservations');
       } else if (user.role === 'client') {
         navigate('/client/home');
       } else {

@@ -10,7 +10,8 @@ import {
   X,
   Hotel,
   FileText,
-  BarChart3
+  BarChart3,
+  CalendarCheck
 } from 'lucide-react';
 
 const NavbarSuper = () => {
@@ -37,7 +38,7 @@ const NavbarSuper = () => {
     { path: '/super/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/super/hotels', label: 'Hôtels', icon: Hotel },
     { path: '/super/users', label: 'Utilisateurs', icon: Users },
-    { path: '/super/subscriptions', label: 'Abonnements', icon: FileText },
+    { path: '/super/subscriptions', label: 'Planning Abonnements', icon: CalendarCheck },
     { path: '/super/analytics', label: 'Statistiques', icon: BarChart3 },
     { path: '/super/settings', label: 'Paramètres', icon: Settings },
   ];

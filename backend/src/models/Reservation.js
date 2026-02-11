@@ -103,6 +103,16 @@ Reservation.init(
       allowNull: false,
       defaultValue: 0,
     },
+    date_check_in: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: 'Date et heure réelles du check-in',
+    },
+    date_check_out: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: 'Date et heure réelles du check-out',
+    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,

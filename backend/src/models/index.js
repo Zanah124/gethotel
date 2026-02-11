@@ -3,21 +3,19 @@ import sequelize from '../config/database.js';
 // Import des modèles actuellement créés
 import User from './User.js';
 import Hotel from './Hotel.js';
-
-// Décommentez au fur et à mesure que vous créez les modèles
-// import SubscriptionPlan from './SubscriptionPlan.js';
-// import Subscription from './Subscription.js';
+import SubscriptionPlan from './SubscriptionPlan.js';
+import Subscription from './Subscription.js';
 // import Payment from './Payment.js';
 // import Invoice from './Invoice.js';
- import Employee from './Employee.js';
+import Employee from './Employee.js';
 // import Client from './Client.js';
- import TypeChambre from './TypeChambre.js';
+import TypeChambre from './TypeChambre.js';
 import Chambre from './Chambre.js';
 // import Reservation from './Reservation.js';
 // import PaiementClient from './PaiementClient.js';
 // import FactureClient from './FactureClient.js';
- import Stock from './Stock.js';
- import MouvementStock from './MouvementStock.js';
+import Stock from './Stock.js';
+import MouvementStock from './MouvementStock.js';
 import CategorieStock from './CategorieStock.js';
 // import PlanningEmployee from './PlanningEmployee.js';
 // import CongeEmployee from './CongeEmployee.js';
@@ -30,6 +28,10 @@ import CategorieStock from './CategorieStock.js';
 // User <-> Hotel (Relations actives)
 User.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
 Hotel.hasMany(User, { foreignKey: 'hotel_id', as: 'users' });
+
+// Hotel <-> User (Admin de l'hôtel)
+Hotel.belongsTo(User, { foreignKey: 'admin_hotel_id', as: 'admin' });
+User.hasMany(Hotel, { foreignKey: 'admin_hotel_id', as: 'managedHotels' });
 
 //Hotel <-> Employee
 Hotel.hasMany(Employee, { foreignKey: 'hotel_id', as: 'employees' });
@@ -49,19 +51,23 @@ TypeChambre.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
 
 // TypeChambre <-> Chambre 
 TypeChambre.hasMany(Chambre, { foreignKey: 'type_chambre_id', as: 'chambres' });
-Chambre.belongsTo(TypeChambre, { foreignKey: 'type_chambre_id', as: 'typeChambre' });  // ← ICI : 'hotel' → 'typeChambre'
+Chambre.belongsTo(TypeChambre, { foreignKey: 'type_chambre_id', as: 'typeChambre' });  
+
+
+
 
 // TOUTES LES AUTRES RELATIONS SONT COMMENTÉES
 // Décommentez-les au fur et à mesure que vous créez les modèles
 
-/*
+// Hotel <-> Subscription
+Hotel.hasOne(Subscription, { foreignKey: 'hotel_id', as: 'subscription' });
+Subscription.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
+
 // SubscriptionPlan <-> Subscription
 SubscriptionPlan.hasMany(Subscription, { foreignKey: 'plan_id', as: 'subscriptions' });
 Subscription.belongsTo(SubscriptionPlan, { foreignKey: 'plan_id', as: 'plan' });
 
-// Hotel <-> Subscription
-Hotel.hasOne(Subscription, { foreignKey: 'hotel_id', as: 'subscription' });
-Subscription.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
+/*  
 
 // Subscription <-> Payment
 Subscription.hasMany(Payment, { foreignKey: 'subscription_id', as: 'payments' });
@@ -72,12 +78,6 @@ Subscription.hasMany(Invoice, { foreignKey: 'subscription_id', as: 'invoices' })
 Invoice.belongsTo(Subscription, { foreignKey: 'subscription_id', as: 'subscription' });
 
 
-// User <-> Client
-User.hasOne(Client, { foreignKey: 'user_id', as: 'clientProfile' });
-Client.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-
-
-
 // Chambre <-> Reservation
 Chambre.hasMany(Reservation, { foreignKey: 'chambre_id', as: 'reservations' });
 Reservation.belongsTo(Chambre, { foreignKey: 'chambre_id', as: 'chambre' });
@@ -85,6 +85,12 @@ Reservation.belongsTo(Chambre, { foreignKey: 'chambre_id', as: 'chambre' });
 // Client <-> Reservation
 Client.hasMany(Reservation, { foreignKey: 'client_id', as: 'reservations' });
 Reservation.belongsTo(Client, { foreignKey: 'client_id', as: 'client' });
+// User <-> Client
+User.hasOne(Client, { foreignKey: 'user_id', as: 'clientProfile' });
+Client.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+
+
 
 // Reservation <-> PaiementClient
 Reservation.hasMany(PaiementClient, { foreignKey: 'reservation_id', as: 'paiements' });
@@ -130,6 +136,8 @@ const db = {
   sequelize,
   User,
   Hotel,
+  SubscriptionPlan,
+  Subscription,
   Stock,
   MouvementStock,
   CategorieStock,
@@ -138,18 +146,12 @@ const db = {
   TypeChambre
   // Ajoutez les autres modèles au fur et à mesure
   /*
-  SubscriptionPlan,
-  Subscription,
   Payment,
   Invoice,
-  
   Client,
-  
-  
   Reservation,
   PaiementClient,
-  FactureClient,  */
-  /*
+  FactureClient,
   PlanningEmployee,
   CongeEmployee,
   Notification

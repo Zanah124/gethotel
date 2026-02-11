@@ -1,27 +1,28 @@
 // src/components/stock/HistoriqueMouvementsModal.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../services/api.js';
 import { Package, ArrowUpRight, ArrowDownRight, Calendar, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-const API_URL = 'http://localhost:3000/api/employee/stock';
-
-const HistoriqueMouvementsModal = ({ isOpen, onClose, article }) => {
+/**
+ * Modal d'historique des mouvements de stock.
+ * @param {string} apiPath - Base path API: 'employee/stock' (défaut) ou 'admin/stock'
+ */
+const HistoriqueMouvementsModal = ({ isOpen, onClose, article, apiPath = 'employee/stock' }) => {
   const [mouvements, setMouvements] = useState([]);
   const [loading, setLoading] = useState(true);
-  const token = localStorage.getItem('token');
 
   useEffect(() => {
     if (isOpen && article) {
       const fetchMouvements = async () => {
         setLoading(true);
         try {
-          const res = await axios.get(`${API_URL}/${article.id}/mouvements`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          // Trier par date décroissante
-          const sorted = res.data.data.sort((a, b) => new Date(b.date_mouvement) - new Date(a.date_mouvement));
+          const res = await api.get(`${apiPath}/${article.id}/mouvements`);
+          const data = res.data?.data ?? res.data ?? [];
+          const sorted = Array.isArray(data)
+            ? [...data].sort((a, b) => new Date(b.date_mouvement) - new Date(a.date_mouvement))
+            : [];
           setMouvements(sorted);
         } catch (err) {
           alert('Erreur lors du chargement de l\'historique');
@@ -32,7 +33,7 @@ const HistoriqueMouvementsModal = ({ isOpen, onClose, article }) => {
       };
       fetchMouvements();
     }
-  }, [isOpen, article, token]);
+  }, [isOpen, article, apiPath]);
 
   if (!isOpen || !article) return null;
 

@@ -14,8 +14,9 @@ import { hotelAccess } from '../../middleware/hotelAccess.js';
 
 const router = express.Router();
 
-// Toutes les routes protégées pour employé
-router.use(auth, roleCheck(['Employee']), hotelAccess);
+// Routes protégées pour les employés ET admins d'hôtel
+// (admin et admin_hotel peuvent également gérer les réservations de leur hôtel)
+router.use(auth, roleCheck(['employee', 'admin', 'admin_hotel']), hotelAccess);
 
 router.get('/', getReservations);
 router.get('/:id', getReservationById);

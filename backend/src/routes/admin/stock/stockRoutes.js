@@ -18,8 +18,8 @@ import { hotelAccess } from '../../../middleware/hotelAccess.js';
 
 const router = express.Router();
 
-// Toutes les routes nécessitent authentification + rôle Admin
-router.use(auth, roleCheck(['admin']), hotelAccess);
+// Toutes les routes nécessitent authentification + rôle Admin ou Admin hôtel
+router.use(auth, roleCheck(['admin', 'admin_hotel']), hotelAccess);
 
 // Routes articles stock
 router.get('/', getAllStock);

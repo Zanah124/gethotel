@@ -23,6 +23,8 @@ import MyReservations from './pages/client/MyReservations.jsx';
 //Pages employee
 import Stock from './pages/employee/stock.jsx';
 import EmployeeReservations from './pages/employee/EmployeeReservations.jsx';
+import CheckIn from './components/employees/CheckIn.jsx';
+import CheckOut from './components/employees/CheckOut.jsx';
 import AddProduitModal from './components/stock/AddProduitModal.jsx';
 import MouvementModal from './components/stock/MouvementModal.jsx';
 import CategorieModal from './components/stock/CategorieModal.jsx';
@@ -40,6 +42,7 @@ import ChambresDashboard from './components/admin/ChambresDashboard.jsx';
 import AddChambreForm from './components/admin/AddChambreForm.jsx';
 import EditChambreForm from './components/admin/EditChambreForm.jsx';
 import StockDashboard from './pages/admin/StockDashboard.jsx';
+import AdminReservations from './pages/admin/AdminReservations.jsx';
 
 
 // pages superadmin
@@ -48,6 +51,7 @@ import MenuSuper from './pages/superadmin/MenuSuper.jsx';
 import HotelsG from './pages/superadmin/HotelsG.jsx';
 import CreateHotel from './components/superadmin/CreateHotel.jsx';
 import UsersSuper from './pages/superadmin/UsersSuper.jsx';
+import SubscriptionsPlanning from './pages/superadmin/SubscriptionsPlanning.jsx';
 
 
 const AppContent = () => {
@@ -99,6 +103,8 @@ const AppContent = () => {
           {/* Employee hôtel */}
           <Route path="/employee/stock" element={<Stock />} />
           <Route path="/employee/reservations" element={<EmployeeReservations />} />
+          <Route path="/employee/checkin" element={<CheckIn />} />
+          <Route path="/employee/checkout" element={<CheckOut/>} />
           <Route path="/employee/stock/create" element={<AddProduitModal />} />
           <Route path="/employee/stock/mouvements" element={<MouvementModal />} />
           <Route path="/employee/stock/categories" element={<CategorieModal />} />
@@ -116,6 +122,7 @@ const AppContent = () => {
           <Route path="/admin/chambres/add" element={<AddChambreForm />} />
           <Route path="/admin/chambres/edit/:id" element={<EditChambreForm />} />
           <Route path="/admin/stock" element={<StockDashboard />} />
+          <Route path="/admin/reservations" element={<AdminReservations />} />
 
           {/* Super Admin → tout sous /super */}
           <Route
@@ -129,6 +136,7 @@ const AppContent = () => {
                     <Route path="hotels" element={<HotelsG />} />
                     <Route path="hotels/create" element={<CreateHotel />} />
                     <Route path="users" element={<UsersSuper />} />
+                    <Route path="subscriptions" element={<SubscriptionsPlanning />} />
                 </Routes>
                 </div>
               </SuperAdminRoute>

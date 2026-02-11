@@ -137,17 +137,18 @@ export const checkIn = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Réservation non trouvée ou non prête pour check-in' });
     }
 
-    // Mettre à jour réservation
+    // Mettre à jour réservation + enregistrer l'heure réelle du check-in
     reservation.statut = 'check_in';
+    reservation.date_check_in = new Date();
     await reservation.save();
 
-    // Mettre à jour statut chambre
+    // Mettre à jour statut chambre (occupée)
     if (reservation.chambre) {
       reservation.chambre.statut = 'occupee';
       await reservation.chambre.save();
     }
 
-    res.status(200).json({ success: true, message: 'Check-in effectué avec succès' });
+    res.status(200).json({ success: true, message: 'Check-in effectué avec succès', data: reservation });
   } catch (error) {
     console.error('Erreur checkIn:', error);
     res.status(500).json({ success: false, message: 'Erreur serveur' });
@@ -170,17 +171,18 @@ export const checkOut = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Réservation non trouvée ou non prête pour check-out' });
     }
 
-    // Mettre à jour réservation
+    // Mettre à jour réservation + enregistrer l'heure réelle du check-out
     reservation.statut = 'terminee';
+    reservation.date_check_out = new Date();
     await reservation.save();
 
-    // Libérer la chambre
+    // Libérer la chambre (nettoyage puis disponible)
     if (reservation.chambre) {
-      reservation.chambre.statut = 'nettoyage'; // ou 'disponible' selon politique
+      reservation.chambre.statut = 'nettoyage';
       await reservation.chambre.save();
     }
 
-    res.status(200).json({ success: true, message: 'Check-out effectué avec succès' });
+    res.status(200).json({ success: true, message: 'Check-out effectué avec succès', data: reservation });
   } catch (error) {
     console.error('Erreur checkOut:', error);
     res.status(500).json({ success: false, message: 'Erreur serveur' });

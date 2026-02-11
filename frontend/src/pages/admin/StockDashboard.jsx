@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Package, AlertTriangle, TrendingUp, TrendingDown, Download, RefreshCw, ArrowRight } from 'lucide-react';
+import { Package, AlertTriangle, TrendingUp, TrendingDown, Download, RefreshCw, ArrowRight, History } from 'lucide-react';
 import stockService from '../../services/admin/stockService';
+import HistoriqueMouvementsModal from '../../components/stock/HistoriqueMouvementsModal';
 
 const StockDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -8,6 +9,8 @@ const StockDashboard = () => {
   const [alerts, setAlerts] = useState([]);
   const [recentStock, setRecentStock] = useState([]);
   const [error, setError] = useState('');
+  const [historiqueOpen, setHistoriqueOpen] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -327,10 +330,10 @@ const StockDashboard = () => {
                   return (
                     <div
                       key={article.id}
-                      className="p-3 rounded-lg flex justify-between items-center"
+                      className="p-3 rounded-lg flex justify-between items-center gap-3"
                       style={{ backgroundColor: 'white' }}
                     >
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <p className="font-medium" style={{ color: '#131114' }}>
                           {article.nom_article}
                         </p>
@@ -338,9 +341,24 @@ const StockDashboard = () => {
                           {formatNumber(article.quantite_actuelle)} {article.unite_mesure || ''}
                         </p>
                       </div>
-                      {isLow && (
-                        <AlertTriangle size={20} style={{ color: '#A62609' }} />
-                      )}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {isLow && (
+                          <AlertTriangle size={20} style={{ color: '#A62609' }} />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedArticle(article);
+                            setHistoriqueOpen(true);
+                          }}
+                          className="px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-sm font-medium transition"
+                          style={{ color: '#081F5C', backgroundColor: '#E6EED6' }}
+                          title="Voir l'historique des mouvements"
+                        >
+                          <History size={16} />
+                          Historique
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -374,6 +392,17 @@ const StockDashboard = () => {
             </p>
           </div>
         )}
+
+        {/* Modal Historique des mouvements (même vue que l'employé) */}
+        <HistoriqueMouvementsModal
+          isOpen={historiqueOpen}
+          onClose={() => {
+            setHistoriqueOpen(false);
+            setSelectedArticle(null);
+          }}
+          article={selectedArticle}
+          apiPath="admin/stock"
+        />
       </div>
     </div>
   );

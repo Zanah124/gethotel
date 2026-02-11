@@ -1,13 +1,50 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Hotel, Users, TrendingUp, DollarSign, Calendar, Star } from 'lucide-react';
+import api from '../../services/api.js';
+import { Hotel, Users, CalendarCheck, Star } from 'lucide-react';
 
 const SuperDashboard = () => {
-  const stats = [
-    { label: 'Hôtels actifs', value: '48', icon: Hotel, color: 'from-blue-500 to-cyan-500' },
-    { label: 'Utilisateurs', value: '1 284', icon: Users, color: 'from-purple-500 to-pink-500' },
-    { label: 'Revenus mois', value: '127 400 000 Ar', icon: DollarSign, color: 'from-green-500 to-emerald-500' },
-    { label: 'Croissance', value: '+23%', icon: TrendingUp, color: 'from-orange-500 to-red-500' },
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    hotels: null,
+    users: null,
+    subscriptions: null,
+    subscriptionsActive: null,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const [hotelsRes, usersRes, subsRes, subsActiveRes] = await Promise.all([
+          api.get('/superadmin/hotels', { params: { page: 1, limit: 1 } }),
+          api.get('/superadmin/users', { params: { page: 1, limit: 1 } }),
+          api.get('/superadmin/subscriptions', { params: { page: 1, limit: 1 } }),
+          api.get('/superadmin/subscriptions', { params: { status: 'active', page: 1, limit: 1 } }),
+        ]);
+        setStats({
+          hotels: hotelsRes.data?.pagination?.total ?? 0,
+          users: usersRes.data?.pagination?.total ?? 0,
+          subscriptions: subsRes.data?.pagination?.total ?? 0,
+          subscriptionsActive: subsActiveRes.data?.pagination?.total ?? 0,
+        });
+      } catch (err) {
+        console.error('Erreur chargement stats dashboard:', err);
+        setStats({ hotels: 0, users: 0, subscriptions: 0, subscriptionsActive: 0 });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const formatNumber = (n) => (n != null ? n.toLocaleString('fr-FR') : '—');
+
+  const statsCards = [
+    { label: 'Hôtels', value: formatNumber(stats.hotels), icon: Hotel, color: 'from-blue-500 to-cyan-500' },
+    { label: 'Utilisateurs', value: formatNumber(stats.users), icon: Users, color: 'from-purple-500 to-pink-500' },
+    { label: 'Abonnements', value: formatNumber(stats.subscriptions), icon: CalendarCheck, color: 'from-green-500 to-emerald-500' },
+    { label: 'Abonnements actifs', value: formatNumber(stats.subscriptionsActive), icon: Star, color: 'from-orange-500 to-red-500' },
   ];
 
   return (
@@ -27,15 +64,25 @@ const SuperDashboard = () => {
       {/* Stats Cards */}
       <div className="max-w-7xl mx-auto px-6 -mt-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-xl p-6 transform hover:scale-105 transition-all">
-              <div className={`w-14 h-14 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mb-4`}>
-                <stat.icon className="w-8 h-8 text-white" />
+          {loading ? (
+            [...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl shadow-xl p-6 animate-pulse">
+                <div className="w-14 h-14 bg-gray-200 rounded-xl mb-4" />
+                <div className="h-4 bg-gray-200 rounded w-24 mb-2" />
+                <div className="h-8 bg-gray-200 rounded w-16" />
               </div>
-              <p className="text-gray-600 text-sm">{stat.label}</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
-            </div>
-          ))}
+            ))
+          ) : (
+            statsCards.map((stat, i) => (
+              <div key={i} className="bg-white rounded-2xl shadow-xl p-6 transform hover:scale-105 transition-all">
+                <div className={`w-14 h-14 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mb-4`}>
+                  <stat.icon className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-gray-600 text-sm">{stat.label}</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
