@@ -3,6 +3,7 @@ import hotelService from "../../services/client/hotelService";
 import BookingForm from "../../components/clients/BookingForm";
 import { useAuth } from "../../context/useAuth";
 import { useNavigate } from "react-router-dom";
+import { getHotelImageUrl } from "../../utils/imageUtils";
 import "./SearchHotels.css"; // optionnel pour styliser un peu
 
 export default function SearchHotels() {
@@ -75,13 +76,13 @@ export default function SearchHotels() {
             hotels.map((hotel) => (
               <div key={hotel.id} className="hotel-card">
                 <img
-  src={hotel.photo_principale 
-    ? `http://localhost:3000/uploads/${hotel.photo_principale}`
-    : "/assets/images/hotel-placeholder.jpg"
-  }
-  alt={hotel.nom}
-  className="hotel-image"
-/>
+                  src={hotel.photo_principale
+                    ? getHotelImageUrl(hotel.photo_principale)
+                    : "/assets/images/hotel-placeholder.jpg"
+                  }
+                  alt={hotel.nom}
+                  className="hotel-image"
+                />
                 <div className="hotel-info">
                   <h2>{hotel.nom}</h2>
                   <p>{hotel.ville}, {hotel.pays}</p>

@@ -33,7 +33,7 @@ export default function LoginForm() {
       } else if (user.role === 'employee') {
         navigate('/employee/reservations');
       } else if (user.role === 'client') {
-        navigate('/client/home');
+        navigate('/search');
       } else {
         navigate('/');
       }

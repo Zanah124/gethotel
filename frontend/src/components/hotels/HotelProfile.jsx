@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {Link} from 'react-router-dom';
 import { Building2, MapPin, Phone, Mail, Star, Wifi, Car, Coffee, Shield, CheckCircle } from 'lucide-react';
 import api from '../../services/api';
+import { getHotelImageUrl } from '../../utils/imageUtils';
 
 const HotelProfile = () => {
   const [hotel, setHotel] = useState(null);
@@ -40,7 +41,7 @@ const HotelProfile = () => {
         {/* Bannière */}
         <div className="bg-gradient-to-r from-blue-600 to-white-700 h-64 rounded-2xl overflow-hidden relative shadow-2xl">
           {hotel.photos?.[0] ? (
-            <img src={`http://localhost:3000${hotel.photos[0]}`} alt="Cover" className="w-full h-full object-cover" />
+            <img src={getHotelImageUrl(hotel.photos[0])} alt="Cover" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-black opacity-40"></div>
           )}
@@ -52,9 +53,9 @@ const HotelProfile = () => {
           <div className="inline-block bg-white p-4 rounded-2xl shadow-2xl">
             <div className="w-40 h-40 bg-Rust-200 rounded-full overflow-hidden border-8 border-white">
               {hotel.photo_principale ? (
-                <img src={`http://localhost:3000${hotel.photo_principale}`} alt={hotel.nom} className="w-full h-full object-cover" />
+                <img src={getHotelImageUrl(hotel.photo_principale)} alt={hotel.nom} className="w-full h-full object-cover" />
               ) : hotel.photos?.[0] ? (
-                <img src={`http://localhost:3000${hotel.photos[0]}`} alt={hotel.nom} className="w-full h-full object-cover" />
+                <img src={getHotelImageUrl(hotel.photos[0])} alt={hotel.nom} className="w-full h-full object-cover" />
               ) : (
                 <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-500 to-teal-600">
                   <Building2 size={70} className="text-white" />

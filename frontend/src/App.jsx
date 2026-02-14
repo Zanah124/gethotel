@@ -29,6 +29,8 @@ import AddProduitModal from './components/stock/AddProduitModal.jsx';
 import MouvementModal from './components/stock/MouvementModal.jsx';
 import CategorieModal from './components/stock/CategorieModal.jsx';
 import EmployeeChambresDashboard from './components/employees/EmployeeChambresDashboard.jsx';
+import EmployeeCreateReservation from './components/employees/EmployeeCreateReservation.jsx';
+import EmployeePlanning from './pages/employee/EmployeePlanning.jsx';
 
 // pages admin
 import Dashboard from './pages/admin/Dashboard.jsx';
@@ -43,6 +45,7 @@ import AddChambreForm from './components/admin/AddChambreForm.jsx';
 import EditChambreForm from './components/admin/EditChambreForm.jsx';
 import StockDashboard from './pages/admin/StockDashboard.jsx';
 import AdminReservations from './pages/admin/AdminReservations.jsx';
+import Planning from './pages/admin/Planning.jsx';
 
 
 // pages superadmin
@@ -109,6 +112,8 @@ const AppContent = () => {
           <Route path="/employee/stock/mouvements" element={<MouvementModal />} />
           <Route path="/employee/stock/categories" element={<CategorieModal />} />
           <Route path="/employee/chambres" element={<EmployeeChambresDashboard />} />
+          <Route path="/employee/reservations/new" element={<EmployeeCreateReservation />} />
+          <Route path="/employee/planning" element={<EmployeePlanning />} />
 
           {/* Admin hôtel */}
           <Route path="/admin/dashboard" element={<Dashboard />} />
@@ -123,6 +128,7 @@ const AppContent = () => {
           <Route path="/admin/chambres/edit/:id" element={<EditChambreForm />} />
           <Route path="/admin/stock" element={<StockDashboard />} />
           <Route path="/admin/reservations" element={<AdminReservations />} />
+          <Route path="/admin/planning" element={<Planning />} />
 
           {/* Super Admin → tout sous /super */}
           <Route

@@ -22,6 +22,7 @@ const NavbarAdmin = () => {
     { name: 'Hôtels', path: '/admin/hotels' },
     { name: 'Chambre', path: '/admin/chambres' },
     { name: 'Employés', path: '/admin/employees' },
+    { name: 'Planning', path: '/admin/planning' },
     { name: 'Réservations', path: '/admin/reservations' },
     { name: 'Stock', path: '/admin/stock' },
   ];

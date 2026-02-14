@@ -13,18 +13,31 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 // Importer sequelize et routes APRÈS dotenv
+//Public routes
 import sequelize from './src/config/database.js';
 import authRoutes from './src/routes/authRoutes.js';
+
+//Admin routes
 import adminRoutes from './src/routes/admin/index.js';
-import employeeRoutes from './src/routes/admin/employeeRoutes.js';
-import superadminRoutes from './src/routes/superadmin/index.js';
-import employeeStock from './src/routes/employee/stock/index.js';
 import chambreRoute from './src/routes/admin/chambreRoute.js';
 import typeChambreRoute from './src/routes/admin/typeChambreRoute.js';
+
+//Employee routes
+import employeeRoutes from './src/routes/admin/employeeRoutes.js';
+import planningRoutes from './src/routes/admin/planningRoutes.js';
+import employeeStock from './src/routes/employee/stock/index.js';
+import employeeReservationRoutes from './src/routes/employee/reservationRoutes.js';
+import employeeChambre from './src/routes/employee/chambreRoutes.js';
+import employeeClient from './src/routes/employee/clientRoutes.js';
+import employeePlanningRoutes from './src/routes/employee/planningRoutes.js';
+
+//Superadmin routes
+import superadminRoutes from './src/routes/superadmin/index.js';
+
+//Client routes 
 import hotelRoutes from './src/routes/client/hotelRoutes.js';
 import reservationRoutes from './src/routes/client/reservationRoutes.js';
 import notificationRoutes from './src/routes/client/notificationRoutes.js';
-import employeeReservationRoutes from './src/routes/employee/reservationRoutes.js';
 
 
 const app = express();
@@ -56,16 +69,28 @@ app.get('/', (req, res) => res.json({ message: 'API Hotel Management – OK', ve
 app.use('/api/auth', authRoutes);
 console.log('✅ Routes /api/auth montées');
 
+//Admin routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/employees', employeeRoutes);
-app.use('/api/superadmin', superadminRoutes);
-app.use('/api/employee/stock', employeeStock);
+app.use('/api/admin/planning', planningRoutes);
 app.use('/api/admin/chambres', chambreRoute);
 app.use('/api/admin/types-chambre', typeChambreRoute);
+
+//Superadmin routes
+app.use('/api/superadmin', superadminRoutes);
+
+//Employee routes
+app.use('/api/employee/stock', employeeStock);
+app.use('/api/employee/reservations', employeeReservationRoutes);
+app.use('/api/employee/chambres', employeeChambre);
+app.use('/api/employee/clients', employeeClient);
+app.use('/api/employee/planning', employeePlanningRoutes);
+
+//Client routes
 app.use('/api/client/hotels', hotelRoutes);
 app.use('/api/client/reservations', reservationRoutes);
 app.use('/api/client/notifications', notificationRoutes);
-app.use('/api/employee/reservations', employeeReservationRoutes);
+
 console.log('✅ Routes client (hotels, réservations, notifications) et employee/reservations montées');
 
 // Middleware 404 - APRÈS toutes les routes

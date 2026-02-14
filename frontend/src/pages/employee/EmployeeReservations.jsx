@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import employeeReservationService from '../../services/employee/reservationService';
-import { LogIn, LogOut, Calendar } from 'lucide-react';
+import { LogIn, LogOut, Calendar, Plus } from 'lucide-react';
 
 /**
  * Vue Réservations employé.
@@ -228,6 +228,20 @@ export default function EmployeeReservations({ initialStatut = '', pageTitle, lo
               Rechercher
             </button>
           </form>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+  <h1 className="text-2xl font-bold text-gray-900">
+    {pageTitle || "Réservations"}
+  </h1>
+
+  {/* Nouveau bouton */}
+  <button
+    onClick={() => navigate('/employee/reservations/new')}
+    className="flex items-center px-5 py-2.5 bg-[#081F5C] text-white rounded-lg hover:bg-[#06173d] shadow-sm font-medium"
+  >
+    <Plus className="w-5 h-5 mr-2" />
+    Nouvelle réservation
+  </button>
+</div>
           {!lockFilter && (
             <select
               value={statut}

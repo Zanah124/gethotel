@@ -6,20 +6,21 @@ import {
   checkIn,
   checkOut,
   cancelReservation,
+  createReservation,
 } from '../../controllers/employee/reservationController.js';
 import { auth } from '../../middleware/auth.js';
 import { roleCheck } from '../../middleware/roleCheck.js';
 import { hotelAccess } from '../../middleware/hotelAccess.js';
 
-
 const router = express.Router();
 
-// Routes protégées pour les employés ET admins d'hôtel
-// (admin et admin_hotel peuvent également gérer les réservations de leur hôtel)
+// Protection globale pour toutes les routes
 router.use(auth, roleCheck(['employee', 'admin', 'admin_hotel']), hotelAccess);
 
+// Routes
 router.get('/', getReservations);
 router.get('/:id', getReservationById);
+router.post('/', createReservation);  // ✅ Plus de doublon auth
 router.patch('/:id/confirm', confirmReservation);
 router.patch('/:id/checkin', checkIn);
 router.patch('/:id/checkout', checkOut);

@@ -8,6 +8,7 @@ import Subscription from './Subscription.js';
 // import Payment from './Payment.js';
 // import Invoice from './Invoice.js';
 import Employee from './Employee.js';
+import PlanningEmployee from './PlanningEmployee.js';
 // import Client from './Client.js';
 import TypeChambre from './TypeChambre.js';
 import Chambre from './Chambre.js';
@@ -17,7 +18,6 @@ import Chambre from './Chambre.js';
 import Stock from './Stock.js';
 import MouvementStock from './MouvementStock.js';
 import CategorieStock from './CategorieStock.js';
-// import PlanningEmployee from './PlanningEmployee.js';
 // import CongeEmployee from './CongeEmployee.js';
 // import Notification from './Notification.js';
 
@@ -40,6 +40,10 @@ Employee.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
 // User <-> Employee
 User.hasOne(Employee, { foreignKey: 'user_id', as: 'employeeProfile' });
 Employee.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+// Employee <-> PlanningEmployee (la table planning_employees n'a pas hotel_id)
+Employee.hasMany(PlanningEmployee, { foreignKey: 'employee_id', as: 'plannings' });
+PlanningEmployee.belongsTo(Employee, { foreignKey: 'employee_id', as: 'employee' });
 
 // Hotel <-> Chambre 
 Hotel.hasMany(Chambre, { foreignKey: 'hotel_id', as: 'chambres' });
@@ -142,6 +146,7 @@ const db = {
   MouvementStock,
   CategorieStock,
   Employee,
+  PlanningEmployee,
   Chambre,
   TypeChambre
   // Ajoutez les autres modèles au fur et à mesure
@@ -152,7 +157,6 @@ const db = {
   Reservation,
   PaiementClient,
   FactureClient,
-  PlanningEmployee,
   CongeEmployee,
   Notification
   */

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Star, Users, Wifi, Car } from 'lucide-react';
+import { getFirstHotelPhoto } from '../../utils/imageUtils';  // ← import
 
 const HotelCard = ({ hotel }) => {
   // Sécurité si données manquantes
@@ -8,24 +9,26 @@ const HotelCard = ({ hotel }) => {
   const city = hotel.ville || 'Ville inconnue';
   const address = hotel.adresse || '';
   const stars = hotel.etoiles || 0;
-  const photos = hotel.photos || [];
-  const mainPhoto = photos[0] || 'https://via.placeholder.com/400x300?text=Hôtel';
   const rating = hotel.rating || 4.5;
   const totalReviews = hotel.totalReviews || 128;
+  const mainPhoto = getFirstHotelPhoto(hotel.photos, hotel.photo_principale);
 
   return (
-    <Link 
-      to={`/hotels/${hotel._id}`} 
+    <Link
+      to={`/hotels/${hotel.id}`}           // ← .id au lieu de ._id (selon ton API)
       className="block group"
       onClick={() => window.scrollTo(0, 0)}
     >
       <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
         {/* Image principale */}
         <div className="relative h-64 overflow-hidden">
-          <img 
-            src={mainPhoto} 
+          <img
+            src={mainPhoto}
             alt={name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/400x300?text=Image+introuvable';
+            }}
           />
           <div className="absolute top-4 left-4">
             <span className="bg-[#49B9FF] text-black text-xs font-bold px-3 py-1 rounded-full">
@@ -33,7 +36,7 @@ const HotelCard = ({ hotel }) => {
             </span>
           </div>
           <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-lg text-sm font-medium">
-            {photos.length} photos
+            {(hotel.photos || []).length} photos
           </div>
         </div>
 
@@ -52,16 +55,17 @@ const HotelCard = ({ hotel }) => {
           <div className="flex items-center gap-2 text-gray-600 mb-3">
             <MapPin size={16} />
             <span className="text-sm">
-              {city} • {address.substring(0, 40)}{address.length > 40 ? '...' : ''}
+              {city} • {address.substring(0, 40)}
+              {address.length > 40 ? '...' : ''}
             </span>
           </div>
 
           {/* Étoiles */}
           <div className="flex gap-1 mb-4">
             {[...Array(5)].map((_, i) => (
-              <Star 
-                key={i} 
-                size={16} 
+              <Star
+                key={i}
+                size={16}
                 className={i < stars ? 'text-[#f4B34C] fill-current' : 'text-gray-300'}
               />
             ))}
@@ -77,17 +81,6 @@ const HotelCard = ({ hotel }) => {
               <span className="text-gray-500">+{hotel.equipements.length - 3} autres</span>
             )}
           </div>
-
-          {/* Prix de départ (optionnel plus tard) */}
-          {/* <div className="mt-4 flex justify-between items-center">
-            <div>
-              <span className="text-2xl font-bold text-gray-900">Ar 250 000</span>
-              <span className="text-sm text-gray-500">/nuit</span>
-            </div>
-            <button className="bg-[#49B9FF] hover:bg-[#3aa8ee] text-black font-bold px-6 py-2 rounded-full text-sm transition">
-              Voir l'hôtel
-            </button>
-          </div> */}
         </div>
       </div>
     </Link>

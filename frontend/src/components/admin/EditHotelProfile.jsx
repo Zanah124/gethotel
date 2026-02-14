@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, Star, Save, Loader2, Upload, Camera } from 'lucide-react';
 import api from '../../services/api';
+import { getHotelImageUrl } from '../../utils/imageUtils';
 
 const EditHotelProfile = () => {
   const [hotel, setHotel] = useState(null);
@@ -142,8 +143,6 @@ const EditHotelProfile = () => {
     );
   }
 
-  const baseUrl = 'http://localhost:3000';
-
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -174,7 +173,7 @@ const EditHotelProfile = () => {
                 {formData.photos?.[0] ? (
                   <div className="space-y-6">
                     <img
-                      src={`${baseUrl}${formData.photos[0]}`}
+                      src={getHotelImageUrl(formData.photos[0])}
                       alt="Bannière"
                       className="w-full max-w-4xl h-64 object-cover rounded-xl mx-auto shadow-lg"
                     />
@@ -215,7 +214,7 @@ const EditHotelProfile = () => {
                 {formData.photo_principale ? (
                   <div className="space-y-6">
                     <img
-                      src={`${baseUrl}${formData.photo_principale}`}
+                      src={getHotelImageUrl(formData.photo_principale)}
                       alt="Logo"
                       className="w-80 h-80 object-cover rounded-xl mx-auto shadow-lg"
                     />
