@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le :  lun. 09 fév. 2026 à 13:40
+-- Généré le :  sam. 14 fév. 2026 à 15:22
 -- Version du serveur :  5.7.17
 -- Version de PHP :  5.6.30
 
@@ -21,8 +21,6 @@ SET time_zone = "+00:00";
 --
 -- Base de données :  `hotel_management`
 --
-CREATE DATABASE IF NOT EXISTS `hotel_management` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `hotel_management`;
 
 -- --------------------------------------------------------
 
@@ -68,8 +66,8 @@ CREATE TABLE `chambres` (
 --
 
 INSERT INTO `chambres` (`id`, `hotel_id`, `type_chambre_id`, `numero_chambre`, `etage`, `statut`, `notes`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, '102', 1, 'nettoyage', 'Vue sur jardin', '2026-01-23 13:35:05', '2026-02-03 11:33:20'),
-(2, 1, 2, '105', 1, 'disponible', 'Vue sur ville', '2026-01-26 07:29:18', '2026-01-26 07:29:18');
+(1, 1, 1, '102', 1, 'disponible', 'Vue sur jardin', '2026-01-23 13:35:05', '2026-02-12 09:48:49'),
+(2, 1, 2, '105', 1, 'occupee', 'Vue sur ville', '2026-01-26 07:29:18', '2026-02-14 07:48:58');
 
 -- --------------------------------------------------------
 
@@ -175,8 +173,7 @@ CREATE TABLE `hotels` (
 --
 
 INSERT INTO `hotels` (`id`, `nom`, `adresse`, `ville`, `pays`, `code_postal`, `telephone`, `email`, `description`, `nombre_etoiles`, `photo_principale`, `photos`, `equipements`, `services`, `politique_annulation`, `admin_hotel_id`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Hôtel Le Louvre Madagascar', 'Lot II Y 42 Bis Ankorondrano', 'Mahajanga', 'Madagascar', '101', '+261 34 05 123 45', 'contact@louvre-mada.mg', 'Hôtel 4 étoiles au cœur d\'Antananarivo avec vue panoramique.', 4, '/uploads/hotels/1-1765357700414-426159006.jpg', '[\"/uploads/hotels/1-1769116025184-912427670.png\"]', '[\"wifi\", \"piscine\", \"spa\", \"parking\", \"restaurant\", \"salle_de_sport\"]', '[\"room_service\", \"blanchisserie\", \"conciergerie\"]', 'Annulation gratuite jusqu\'à 48h avant l\'arrivée.', 2, 1, '2025-12-06 19:27:56', '2026-01-23 00:07:14'),
-(2, 'Le royale Palace', 'Amborovy', 'Mahajanga', 'Madagascar', '401', '03267154378', 'royalepalace@gmail.com', '', 4, NULL, '[]', '[]', '[]', NULL, 11, 1, '2025-12-09 13:37:17', '2025-12-09 13:37:19'),
+(1, 'Hôtel PIETRA Mahajanga', 'Lot II Y 42 Bis Ankorondrano', 'Mahajanga', 'Madagascar', '101', '+261 34 05 123 45', 'contact@louvre-mada.mg', 'Hôtel 4 étoiles au cœur de Mahajanga avec vue panoramique.', 4, '/uploads/hotels/1-1765357700414-426159006.jpg', '[\"/uploads/hotels/1-1769116025184-912427670.png\"]', '[\"wifi\", \"piscine\", \"spa\", \"parking\", \"restaurant\", \"salle_de_sport\"]', '[\"room_service\", \"blanchisserie\", \"conciergerie\"]', 'Annulation gratuite jusqu\'à 48h avant l\'arrivée.', 2, 1, '2025-12-06 19:27:56', '2026-02-14 16:08:17'),
 (3, 'Salama hôtel', 'Mahabibo kely', 'Mahajanga', 'Madagascar', '401', '0329046270', 'salamahotel@gmail.com', 'un hôtel fait pour des touristes', 2, NULL, '[]', '[]', '[]', NULL, 15, 1, '2026-01-23 13:13:21', '2026-01-23 13:13:22');
 
 -- --------------------------------------------------------
@@ -225,7 +222,8 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`id`, `user_id`, `message`, `type`, `reservation_id`, `numero_reservation`, `read`, `created_at`) VALUES
-(1, 13, 'Votre réservation a été confirmée par l\'hôtel. Numéro : RES-1769607137850-XOXSRP', 'reservation_confirmed', 1, 'RES-1769607137850-XOXSRP', 1, '2026-01-28 17:01:42');
+(1, 13, 'Votre réservation a été confirmée par l\'hôtel. Numéro : RES-1769607137850-XOXSRP', 'reservation_confirmed', 1, 'RES-1769607137850-XOXSRP', 1, '2026-01-28 17:01:42'),
+(2, 16, 'Votre réservation RES-19726836 a été créée et confirmée par l\'hôtel.', 'reservation_confirmed', 4, 'RES-19726836', 0, '2026-02-14 00:55:28');
 
 -- --------------------------------------------------------
 
@@ -236,6 +234,8 @@ INSERT INTO `notifications` (`id`, `user_id`, `message`, `type`, `reservation_id
 CREATE TABLE `planning_employees` (
   `id` int(11) NOT NULL,
   `employee_id` int(11) DEFAULT NULL,
+  `week_start` date DEFAULT NULL,
+  `slots` json DEFAULT NULL,
   `date_travail` date NOT NULL,
   `heure_debut` time NOT NULL,
   `heure_fin` time NOT NULL,
@@ -244,6 +244,15 @@ CREATE TABLE `planning_employees` (
   `notes` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `planning_employees`
+--
+
+INSERT INTO `planning_employees` (`id`, `employee_id`, `week_start`, `slots`, `date_travail`, `heure_debut`, `heure_fin`, `poste_assigne`, `is_present`, `notes`, `created_at`) VALUES
+(1, 6, '2026-02-02', '{\"1\": \"repos\", \"2\": \"repos\", \"3\": \"repos\", \"4\": \"09:30-20:00\", \"5\": \"repos\", \"6\": \"repos\", \"7\": \"repos\"}', '2026-02-02', '00:00:00', '00:00:00', NULL, 0, NULL, '2026-02-14 14:13:22'),
+(2, 3, '2026-02-02', '{\"1\": \"repos\", \"2\": \"repos\", \"3\": \"repos\", \"4\": \"repos\", \"5\": \"repos\", \"6\": \"repos\", \"7\": \"repos\"}', '2026-02-02', '00:00:00', '00:00:00', NULL, 0, NULL, '2026-02-14 14:13:23'),
+(3, 5, '2026-02-02', '{\"1\": \"repos\", \"2\": \"congé\", \"3\": \"repos\", \"4\": \"repos\", \"5\": \"repos\", \"6\": \"repos\", \"7\": \"repos\"}', '2026-02-02', '00:00:00', '00:00:00', NULL, 0, NULL, '2026-02-14 14:13:23');
 
 -- --------------------------------------------------------
 
@@ -262,11 +271,13 @@ CREATE TABLE `reservations` (
   `nombre_adultes` int(11) NOT NULL,
   `nombre_enfants` int(11) DEFAULT '0',
   `prix_total` decimal(10,2) NOT NULL,
-  `statut` enum('en_attente','confirmee','annulee','terminee') COLLATE utf8mb4_unicode_ci DEFAULT 'en_attente',
+  `statut` enum('en_attente','confirmee','check_in','check_out','annulee','terminee') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en_attente',
   `demandes_speciales` text COLLATE utf8mb4_unicode_ci,
   `created_by` int(11) DEFAULT NULL,
   `verified_by` int(11) DEFAULT NULL,
   `is_verified` tinyint(1) DEFAULT '0',
+  `date_check_in` datetime DEFAULT NULL COMMENT 'Date et heure réelle du check-in',
+  `date_check_out` datetime DEFAULT NULL COMMENT 'Date et heure réelle du check-out',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -275,10 +286,12 @@ CREATE TABLE `reservations` (
 -- Déchargement des données de la table `reservations`
 --
 
-INSERT INTO `reservations` (`id`, `numero_reservation`, `client_id`, `chambre_id`, `hotel_id`, `date_arrivee`, `date_depart`, `nombre_adultes`, `nombre_enfants`, `prix_total`, `statut`, `demandes_speciales`, `created_by`, `verified_by`, `is_verified`, `created_at`, `updated_at`) VALUES
-(1, 'RES-1769607137850-XOXSRP', 13, 1, 1, '2026-01-30', '2026-02-14', 2, 0, '1200000.00', 'confirmee', NULL, 13, 14, 1, '2026-01-28 13:32:17', '2026-01-28 14:01:42'),
-(2, 'RES-1770040723978-JT241A', 13, 2, 1, '2026-03-05', '2026-04-11', 2, 2, '3774000.00', 'en_attente', NULL, 13, NULL, 0, '2026-02-02 13:58:43', '2026-02-02 13:58:43'),
-(3, 'RES-1770118671297-USSO22', 13, 1, 1, '2026-02-20', '2026-02-28', 1, 0, '640000.00', 'en_attente', NULL, 13, NULL, 0, '2026-02-03 11:37:51', '2026-02-03 11:37:51');
+INSERT INTO `reservations` (`id`, `numero_reservation`, `client_id`, `chambre_id`, `hotel_id`, `date_arrivee`, `date_depart`, `nombre_adultes`, `nombre_enfants`, `prix_total`, `statut`, `demandes_speciales`, `created_by`, `verified_by`, `is_verified`, `date_check_in`, `date_check_out`, `created_at`, `updated_at`) VALUES
+(1, 'RES-1769607137850-XOXSRP', 13, 1, 1, '2026-01-30', '2026-02-14', 2, 0, '1200000.00', 'terminee', NULL, 13, 14, 1, '2026-02-11 11:46:19', '2026-02-12 12:48:35', '2026-01-28 13:32:17', '2026-02-12 09:48:35'),
+(2, 'RES-1770040723978-JT241A', 13, 2, 1, '2026-03-05', '2026-04-11', 2, 2, '3774000.00', 'annulee', NULL, 13, NULL, 0, NULL, NULL, '2026-02-02 13:58:43', '2026-02-11 07:02:25'),
+(3, 'RES-1770118671297-USSO22', 13, 1, 1, '2026-02-20', '2026-02-28', 1, 0, '640000.00', 'en_attente', NULL, 13, NULL, 0, NULL, NULL, '2026-02-03 11:37:51', '2026-02-03 11:37:51'),
+(4, 'RES-19726836', 16, 2, 1, '2026-02-22', '2026-02-28', 1, 0, '612000.00', 'check_in', NULL, 14, 14, 1, '2026-02-14 10:48:58', NULL, '2026-02-13 21:55:26', '2026-02-14 07:48:58'),
+(5, 'RES-1771054932424-8IIJ6M', 13, 1, 1, '2026-03-22', '2026-04-18', 1, 0, '2160000.00', 'annulee', NULL, 13, NULL, 0, NULL, NULL, '2026-02-14 07:42:12', '2026-02-14 07:43:00');
 
 -- --------------------------------------------------------
 
@@ -312,26 +325,6 @@ INSERT INTO `stock` (`id`, `hotel_id`, `categorie_id`, `nom_article`, `descripti
 -- --------------------------------------------------------
 
 --
--- Structure de la table `subscription_plans`
---
-
-CREATE TABLE `subscription_plans` (
-  `id` int(11) NOT NULL,
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Basic, Premium, Enterprise',
-  `price_monthly` decimal(10,2) NOT NULL,
-  `price_yearly` decimal(10,2) NOT NULL,
-  `max_rooms` int(11) NOT NULL DEFAULT '10',
-  `max_employees` int(11) NOT NULL DEFAULT '5',
-  `max_storage_gb` int(11) DEFAULT '5',
-  `features` json DEFAULT NULL COMMENT 'ex: ["réservation en ligne", "paiement stripe", "statistiques avancées"]',
-  `is_active` tinyint(1) DEFAULT '1',
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Structure de la table `subscriptions`
 --
 
@@ -345,6 +338,26 @@ CREATE TABLE `subscriptions` (
   `current_period_end` datetime DEFAULT NULL,
   `trial_end` datetime DEFAULT NULL,
   `canceled_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `subscription_plans`
+--
+
+CREATE TABLE `subscription_plans` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Basic, Premium, Enterprise',
+  `price_monthly` decimal(10,2) NOT NULL,
+  `price_yearly` decimal(10,2) NOT NULL,
+  `max_rooms` int(11) NOT NULL DEFAULT '10',
+  `max_employees` int(11) NOT NULL DEFAULT '5',
+  `max_storage_gb` int(11) DEFAULT '5',
+  `features` json DEFAULT NULL COMMENT 'ex: ["réservation en ligne", "paiement stripe", "statistiques avancées"]',
+  `is_active` tinyint(1) DEFAULT '1',
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -406,11 +419,13 @@ INSERT INTO `users` (`id`, `nom`, `prenom`, `email`, `telephone`, `password`, `r
 (2, 'NY AINA', 'Avo', 'nyainaavo@gmail.com', '+261334517390', '$2a$10$Q13AAMFZVzPREEBlwlQefOoLfg.pZHy9YZwqyKoUGRPCRW7aUEc1C', 'admin', 1, NULL, 'actif', NULL, '2025-12-06 16:53:53', '2025-12-06 16:53:53'),
 (8, 'Sambatra', 'Fy', 'sambatrafy@hotel.com', '329012708', '$2a$10$4bjwDXnZVtiZcpkjGTRiSOr4Vb0czaEYAdVyaLpRJ99bQWQ.Qp1ou', 'employee', 1, NULL, 'actif', NULL, '2025-12-08 22:50:37', '2025-12-08 22:50:37'),
 (9, 'Bertinah', 'Alice', 'alicebertinah@gmail.com', '0326713289', '$2a$10$pmwGX5XMTLU8GaAdcEij9.YkuyFe5Vgi8qqYK8B6oOKmJbQ0LRmkW', 'client', NULL, NULL, 'actif', NULL, '2025-12-09 11:51:44', '2025-12-09 11:51:44'),
-(11, 'Mamy', 'Velo', 'mamyvelo@gmail.com', '0382474912', '$2a$10$GTuCDUh6QDTqjHSIGzRfUeGWcdhxuL2jjqhSs8YbZj53Jaw/F.Kg.', 'admin', 2, NULL, 'actif', NULL, '2025-12-09 13:37:18', '2025-12-09 13:37:18'),
+(11, 'Mamy', 'Velo', 'mamyvelo@gmail.com', '0382474912', '$2a$10$GTuCDUh6QDTqjHSIGzRfUeGWcdhxuL2jjqhSs8YbZj53Jaw/F.Kg.', 'admin', NULL, NULL, 'actif', NULL, '2025-12-09 13:37:18', '2025-12-09 13:37:18'),
 (12, 'Toky', 'aina', 'tokyaina@gmail.com', '', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'employee', 1, NULL, 'actif', NULL, '2025-12-09 14:07:54', '2025-12-09 14:07:54'),
 (13, 'Cendrine', 'Elia', 'eliacendrine@gmail.com', '0328361449', '$2a$10$lzcTzQgWz/DpC3qkOTa4vemX4acDCBNxlGtgEu66eeNHGJ6tdzfr6', 'client', NULL, NULL, 'actif', NULL, '2026-01-23 11:25:04', '2026-01-23 11:25:04'),
 (14, 'Feno', 'Tiana', 'fenotiana@hotel.com', '0347648923', '$2a$10$7JMqhsI1dESEsWgHs9aa4.VUXMoMCyznSEO8GlxPibQhctZ4N62Zm', 'employee', 1, NULL, 'actif', NULL, '2026-01-23 11:35:37', '2026-01-23 11:35:37'),
-(15, 'Toussaint', 'Benjamin', 'toussaintbenjamin@gmail.com', '0347419132', '$2a$10$3qqFvfCc.QPhuhhh.VSODeQSoJZdijZRx./g3tnHrZ58FvQA5CE5i', 'admin', 3, NULL, 'actif', NULL, '2026-01-23 13:13:21', '2026-01-23 13:13:21');
+(15, 'Toussaint', 'Benjamin', 'toussaintbenjamin@gmail.com', '0347419132', '$2a$10$3qqFvfCc.QPhuhhh.VSODeQSoJZdijZRx./g3tnHrZ58FvQA5CE5i', 'admin', 3, NULL, 'actif', NULL, '2026-01-23 13:13:21', '2026-01-23 13:13:21'),
+(16, 'YVAN', 'elio', 'yvanelio@gmail.com', '032 45 321 23', '$2a$10$EVvy79avoXaTpuAXJtsvHeVZtMhUjbtCSVsTHt7T7fS9K2OMJf.hy', 'client', 1, NULL, 'actif', NULL, '2026-02-14 00:55:22', '2026-02-14 00:55:22'),
+(17, 'ZARA', 'Berthun', 'zaraberthun@gmail.com', '0320312377', '$2a$10$fwqnUg6QHrZz2p4SVLqMe.0QiLHbt08eb9AQvX3OrFuuwg5gwROge', 'client', 1, NULL, 'actif', NULL, '2026-02-14 10:20:15', '2026-02-14 10:20:15');
 
 --
 -- Index pour les tables déchargées
@@ -504,14 +519,6 @@ ALTER TABLE `stock`
   ADD KEY `categorie_id` (`categorie_id`);
 
 --
--- Index pour la table `subscription_plans`
---
-ALTER TABLE `subscription_plans`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD UNIQUE KEY `name_2` (`name`);
-
---
 -- Index pour la table `subscriptions`
 --
 ALTER TABLE `subscriptions`
@@ -520,6 +527,14 @@ ALTER TABLE `subscriptions`
   ADD UNIQUE KEY `stripe_subscription_id_2` (`stripe_subscription_id`),
   ADD KEY `hotel_id` (`hotel_id`),
   ADD KEY `plan_id` (`plan_id`);
+
+--
+-- Index pour la table `subscription_plans`
+--
+ALTER TABLE `subscription_plans`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD UNIQUE KEY `name_2` (`name`);
 
 --
 -- Index pour la table `type_chambres`
@@ -580,31 +595,31 @@ ALTER TABLE `mouvements_stock`
 -- AUTO_INCREMENT pour la table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pour la table `planning_employees`
 --
 ALTER TABLE `planning_employees`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT pour la table `reservations`
 --
 ALTER TABLE `reservations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT pour la table `stock`
 --
 ALTER TABLE `stock`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
--- AUTO_INCREMENT pour la table `subscription_plans`
---
-ALTER TABLE `subscription_plans`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
 -- AUTO_INCREMENT pour la table `subscriptions`
 --
 ALTER TABLE `subscriptions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT pour la table `subscription_plans`
+--
+ALTER TABLE `subscription_plans`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT pour la table `type_chambres`
@@ -615,7 +630,7 @@ ALTER TABLE `type_chambres`
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 --
 -- Contraintes pour les tables déchargées
 --
