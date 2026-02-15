@@ -16,3 +16,8 @@ npm run dev
 cd frontend
 npm install
 npm run dev
+
+### mobile-client
+cd mobile-client
+npm install
+npm start
