@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "GetHotel",
+    "slug": "getHotel-mobile-client",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#7238D4"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.getHotel.client"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#7238D4"
+      },
+      "package": "com.getHotel.client"
+    }
+  }
+}

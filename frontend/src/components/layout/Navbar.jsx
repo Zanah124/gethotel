@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { assets } from '../../assets/assets';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -13,7 +14,7 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'Hotels', path: '/search' },
     { name: 'Expérience', path: '/' },
-    { name: 'About', path: '/' },
+    { name: 'À propos', path: '/about' },
   ];
 
   useEffect(() => {
@@ -33,8 +34,9 @@ const Navbar = () => {
     navigate('/');
   };
 
-  // Détermine si la navbar doit être en mode "visible sur blanc"
-  const isNavbarVisible = isLoggedIn || isScrolled;
+  // Pages à fond clair (#F1EDE6) : navbar toujours en mode clair pour la lisibilité
+  const isLightPage = ['/search', '/about'].includes(location.pathname);
+  const isNavbarVisible = isLoggedIn || isScrolled || isLightPage;
 
   return (
     <nav

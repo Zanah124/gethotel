@@ -13,6 +13,7 @@ import NavbarEmployeeHorizontal from './components/layout/NavbarEmployeeHorizont
 // Pages public
 import Home from './pages/client/Home';
 import SearchHotels from './pages/client/SearchHotels';
+import About from './pages/client/About.jsx';
 import Login from './pages/auth/Login.jsx';
 import Register from './pages/auth/Register.jsx';
 
@@ -55,6 +56,8 @@ import HotelsG from './pages/superadmin/HotelsG.jsx';
 import CreateHotel from './components/superadmin/CreateHotel.jsx';
 import UsersSuper from './pages/superadmin/UsersSuper.jsx';
 import SubscriptionsPlanning from './pages/superadmin/SubscriptionsPlanning.jsx';
+import SettingsSuper from './pages/superadmin/SettingsSuper.jsx';
+import AnalyticsSuper from './pages/superadmin/AnalyticsSuper.jsx';
 
 
 const AppContent = () => {
@@ -95,7 +98,8 @@ const AppContent = () => {
         <Routes>
           {/* public */}
           <Route path="/" element={<Home />} />
-          {<Route path="/search" element={<SearchHotels />} />}
+          <Route path="/search" element={<SearchHotels />} />
+          <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
@@ -143,6 +147,8 @@ const AppContent = () => {
                     <Route path="hotels/create" element={<CreateHotel />} />
                     <Route path="users" element={<UsersSuper />} />
                     <Route path="subscriptions" element={<SubscriptionsPlanning />} />
+                    <Route path="settings" element={<SettingsSuper />} />
+                    <Route path="analytics" element={<AnalyticsSuper />} />
                 </Routes>
                 </div>
               </SuperAdminRoute>
